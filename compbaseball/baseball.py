@@ -52,4 +52,4 @@ def parse_inputs(inputs):
 
 def get_inputs():
     with open(os.path.join(CURRENT_PATH, "inputs.json")) as f:
-        return json.loads(f.read())
+        return {"inputs": json.loads(f.read())}
