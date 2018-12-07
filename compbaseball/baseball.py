@@ -1,9 +1,12 @@
 import json
+import os
 
 from pybaseball import playerid_lookup, statcast_pitcher
 
+CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
+
 def get_choices():
-    with open("playerchoices.json") as f:
+    with open(os.path.join(CURRENT_PATH, "playerchoices.json")) as f:
         return json.loads(f.read())
 
 def get_data(pitcher, start_date, end_date):
@@ -45,3 +48,8 @@ def parse_inputs(inputs):
     ew = validate_inputs(inputs)
     return {"params": inputs, "jsonstrs": {"inputs": json.dumps(inputs)},
             "errors_warnings": ew}
+
+
+def get_inputs():
+    with open(os.path.join(CURRENT_PATH, "inputs.json")) as f:
+        return json.loads(f.read())

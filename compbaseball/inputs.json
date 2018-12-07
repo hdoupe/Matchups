@@ -1,0 +1,35 @@
+{
+    "start_date": {
+        "long_name": "Start Date",
+        "description": "Date to start pulling statcast information",
+        "section_1": "Parameters",
+        "section_2": "Date",
+        "notes": "Be careful to not specify too long of a date range.",
+        "col_var": "",
+        "col_label": [""],
+        "type": "date",
+        "value": "2018-08-01"
+    },
+    "end_date": {
+        "long_name": "End Date",
+        "description": "Date to quit pulling statcast information",
+        "section_1": "Parameters",
+        "section_2": "Date",
+        "notes": "Be careful to not specify too long of a date range.",
+        "col_var": "",
+        "col_label": [""],
+        "type": "date",
+        "value": "2018-09-01"
+    },
+    "pitcher": {
+        "long_name": "Pitcher Name",
+        "description": "Name of pitcher to pull data on",
+        "section_1": "Parameters",
+        "section_2": "Pitcher",
+        "notes": "Make sure the name of the pitcher is correct. A good place to reference this is baseball-reference.com",
+        "col_var": "",
+        "col_label": [""],
+        "type": "str",
+        "value": "Clayton Kershaw"
+    }
+}
