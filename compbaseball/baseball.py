@@ -46,8 +46,7 @@ def validate_inputs(inputs):
 
 def parse_inputs(inputs):
     ew = validate_inputs(inputs)
-    return {"params": inputs, "jsonstrs": {"inputs": json.dumps(inputs)},
-            "errors_warnings": ew}
+    return inputs, {"inputs": json.dumps(inputs)}, ew
 
 
 def get_inputs():
