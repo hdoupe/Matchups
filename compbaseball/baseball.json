@@ -1,0 +1,24 @@
+{
+    "pitcher": {
+        "long_name": "Pitcher Name",
+        "description": "Name of pitcher to pull data on",
+        "section_1": "Parameters",
+        "section_2": "Pitcher",
+        "notes": "Make sure the name of the pitcher is correct. A good place to reference this is baseball-reference.com",
+        "type": "str",
+        "number_dims": 0,
+        "value": [{"value": "Clayton Kershaw"}],
+        "range": {}
+    },
+    "batter": {
+        "long_name": "Batter Name",
+        "description": "Name of batter for pitching matchup analysis",
+        "section_1": "Parameters",
+        "section_2": "Batter",
+        "notes": "Make sure the name of the batter is correct. A good place to reference this is baseball-reference.com",
+        "type": "str",
+        "number_dims": 0,
+        "value": [{"value": "Freddie Freeman"}],
+        "range": {}
+    }
+}

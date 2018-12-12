@@ -1,0 +1,18 @@
+{
+    "schema_name": "baseball",
+    "dims": {
+        "start_date": {
+            "type": "date",
+            "validator": {"name": "Range", "args": {"min": "2008-01-01", "max": "2018-11-10"}}
+        },
+        "end_date": {
+            "type": "date",
+            "validator": {"name": "Range", "args": {"min": "2008-01-01", "max": "2018-11-10"}}
+        },
+        "use_full_data": {"type": "bool", "validator": {}}
+    },
+    "optional_params": {
+        "section_1": {"type": "str", "number_dims": 0},
+        "section_2": {"type": "str", "number_dims": 0}
+    }
+}
