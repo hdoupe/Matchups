@@ -12,7 +12,7 @@ def get_choices():
 
 def get_inputs():
     with open(os.path.join(CURRENT_PATH, "inputs.json")) as f:
-        return {"inputs": json.loads(f.read())}
+        return {"pitching": json.loads(f.read())}
 
 
 def pdf_to_clean_html(pdf):
@@ -26,12 +26,12 @@ def pdf_to_clean_html(pdf):
 def get_data(**kwargs):
     defaults = get_inputs()
     specs = {}
-    for param in defaults["inputs"]:
+    for param in defaults["pitching"]:
         if kwargs.get(param, None) is not None:
             specs[param] = kwargs[param][0] # comp params are lists right now.
         else:
-            specs[param] = defaults["inputs"][param]["value"]
-    print(specs)
+            specs[param] = defaults["pitching"][param]["value"]
+    print("getting data according to: ", specs)
     first_name, last_name = specs["pitcher"].split(" ")
     info = playerid_lookup(last_name, first_name)
     results = {'outputs': [], 'aggr_outputs': [], 'meta': {"task_times": [0]}}
@@ -59,14 +59,17 @@ def get_data(**kwargs):
 
 def validate_inputs(inputs):
     # date parameters alredy evaluated by webapp.
-    inputs = inputs["inputs"]
-    ew = {"inputs": {'errors': {}, 'warnings': {}}}
-    pitcher = inputs["pitcher"][0]
+    inputs = inputs["pitching"]
+    ew = {"pitching": {'errors': {}, 'warnings': {}}}
+    pitcher = inputs["pitcher"]
+    if not pitcher:
+        return ew
+    pitcher = pitcher[0]
     choices = get_choices()
     if pitcher not in choices["choices"]:
-        ew["inputs"]["errors"] = {"pitcher": f"pitcher {pitcher} not allowed"}
+        ew["pitching"]["errors"] = {"pitcher": f"pitcher {pitcher} not allowed"}
     return ew
 
 def parse_inputs(inputs):
     ew = validate_inputs(inputs)
-    return (inputs, {"inputs": json.dumps(inputs)}, ew)
+    return (inputs, {"pitching": json.dumps(inputs)}, ew)
