@@ -8,7 +8,7 @@
         "col_var": "",
         "col_label": [""],
         "type": "date",
-        "value": "2018-08-01"
+        "value": "2018-01-01"
     },
     "end_date": {
         "long_name": "End Date",
@@ -19,7 +19,7 @@
         "col_var": "",
         "col_label": [""],
         "type": "date",
-        "value": "2018-09-01"
+        "value": "2018-11-10"
     },
     "pitcher": {
         "long_name": "Pitcher Name",
@@ -31,5 +31,16 @@
         "col_label": [""],
         "type": "str",
         "value": "Clayton Kershaw"
+    },
+    "batter": {
+        "long_name": "Batter Name",
+        "description": "Name of batter to pull data on",
+        "section_1": "Parameters",
+        "section_2": "Batter",
+        "notes": "Make sure the name of the batter is correct. A good place to reference this is baseball-reference.com",
+        "col_var": "",
+        "col_label": [""],
+        "type": "str",
+        "value": "Freddie Freeman"
     }
 }

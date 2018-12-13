@@ -1,7 +1,7 @@
 import json
 import os
 
-from pybaseball import playerid_lookup, statcast_pitcher
+import pandas as pd
 
 CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -12,7 +12,7 @@ def get_choices():
 
 def get_inputs():
     with open(os.path.join(CURRENT_PATH, "inputs.json")) as f:
-        return {"pitching": json.loads(f.read())}
+        return {"matchup": json.loads(f.read())}
 
 
 def pdf_to_clean_html(pdf):
@@ -23,53 +23,117 @@ def pdf_to_clean_html(pdf):
             .replace(' style="text-align: right;"', ''))
 
 
-def get_data(**kwargs):
+def get_matchup(**kwargs):
     defaults = get_inputs()
     specs = {}
-    for param in defaults["pitching"]:
+    for param in defaults["matchup"]:
         if kwargs.get(param, None) is not None:
             specs[param] = kwargs[param][0] # comp params are lists right now.
         else:
-            specs[param] = defaults["pitching"][param]["value"]
+            specs[param] = defaults["matchup"][param]["value"]
     print("getting data according to: ", specs)
-    first_name, last_name = specs["pitcher"].split(" ")
-    info = playerid_lookup(last_name, first_name)
     results = {'outputs': [], 'aggr_outputs': [], 'meta': {"task_times": [0]}}
-    if len(info) == 0:
-        return results
-    mlbid = info.key_mlbam.values[0]
-    data = statcast_pitcher(specs["start_date"], specs["end_date"], mlbid)
-    mean_stat = data.groupby(by="pitch_type")["release_speed", "launch_speed"].mean()
-    std_stat = data.groupby(by="pitch_type")["release_speed", "launch_speed"].std()
+    use_2018 = kwargs["use_2018"]
+    if use_2018:
+        url = "https://s3.amazonaws.com/hank-statcast/statcast2018.parquet"
+    else:
+        url = "https://s3.amazonaws.com/hank-statcast/statcast.parquet"
+    print(f"reading data from {url}")
+    scallcols = pd.read_parquet(url, engine="pyarrow")
+    cols2keep = ["player_name", "batter_name", "pitch_type",
+                "game_date", "release_speed", "events",
+                "launch_speed", "woba_value", "bb_type",
+                "balls", "strikes", "outs_when_up",
+                "at_bat_number", "type"]
+    scall = scallcols.loc[:, cols2keep]
+    scall["date"] = pd.to_datetime(scall["game_date"])
+    sc = scall.loc[(scall.date >= specs["start_date"]) & (scall.date < specs["end_date"])]
+
+    pitcher, batter = specs["pitcher"], specs["batter"]
+    gb = sc.loc[(sc["player_name"]==pitcher) & (sc["batter_name"]==batter), :].groupby(
+        ["balls", "strikes"])
+    pitch_outcome_normalized = pd.DataFrame(gb["type"].value_counts(normalize=True))
+    pitch_outcome = pd.DataFrame(gb["type"].value_counts())
+
+    gb = sc.loc[(sc["player_name"]==pitcher) & (sc["batter_name"]==batter), :].groupby(
+        ["balls", "strikes"])
+    pitch_type_normalized = pd.DataFrame(gb["pitch_type"].value_counts(normalize=True))
+    pitch_type = pd.DataFrame(gb["pitch_type"].value_counts())
+
+    agg_gb = sc.groupby(
+        ["balls", "strikes"])
+    agg_pitch_outcome_normalized = pd.DataFrame(gb["type"].value_counts(normalize=True))
+
+    agg_gb = sc.groupby(
+        ["balls", "strikes"])
+    agg_pitch_type_normalized = pd.DataFrame(gb["pitch_type"].value_counts(normalize=True))
+
 
     results['aggr_outputs'].append({
-        'tags': {'statistic': 'mean'},
-        'title': 'StatCast Means',
-        'downloadable': [{'filename': 'mean' + '.csv',
-                          'text': mean_stat.to_csv()}],
-        'renderable': pdf_to_clean_html(mean_stat)})
+        'tags': {'attribute': 'pitch outcome'},
+        'title': 'Pitch outcome by count for all players',
+        'downloadable': [{'filename': 'pitch_outcome.csv',
+                          'text': agg_pitch_outcome_normalized.to_csv()}],
+        'renderable': pdf_to_clean_html(agg_pitch_outcome_normalized)})
     results['aggr_outputs'].append({
-        'tags': {'statistic': 'std'},
-        'title': 'StatCast Standard Dev.',
-        'downloadable': [{'filename': 'std' + '.csv',
-                          'text': std_stat.to_csv()}],
-        'renderable': pdf_to_clean_html(std_stat)})
+        'tags': {'attribute': 'pitch type'},
+        'title': 'Pitch type by count for all players',
+        'downloadable': [{'filename': 'pitch_type.csv',
+                          'text': agg_pitch_type_normalized.to_csv()}],
+        'renderable': pdf_to_clean_html(agg_pitch_type_normalized)})
+
+    results["outputs"] = [
+        {
+            "dimension": "",
+            "tags": {"attribute": "pitch outcome", "count": "normalized"},
+            'title': f'Normalized pitch outcome by count for {pitcher} v. {batter}',
+            'downloadable': [{'filename': f"normalized_pitch_outcome_{pitcher}_{batter}.csv",
+                              "text": pitch_outcome_normalized.to_csv()}],
+            'renderable': pdf_to_clean_html(pitch_outcome_normalized)
+        },
+        {
+            "dimension": "",
+            "tags": {"attribute": "pitch outcome", "count": "raw count"},
+            'title': f'Pitch outcome by count for {pitcher} v. {batter}',
+            'downloadable': [{'filename': f"pitch_outcome_{pitcher}_{batter}.csv",
+                              "text": pitch_outcome.to_csv()}],
+            'renderable': pdf_to_clean_html(pitch_outcome)
+        },
+        {
+            "dimension": "",
+            "tags": {"attribute": "pitch type", "count": "normalized"},
+            'title': f'Normalized pitch type by count for {pitcher} v. {batter}',
+            'downloadable': [{'filename': f"normalized_pitch_type_{pitcher}_{batter}.csv",
+                              "text": pitch_type_normalized.to_csv()}],
+            'renderable': pdf_to_clean_html(pitch_type_normalized)
+        },
+        {
+            "dimension": "",
+            "tags": {"attribute": "pitch type", "count": "raw count"},
+            'title': f'Pitch type by count for {pitcher} v. {batter}',
+            'downloadable': [{'filename': f"pitch_type{pitcher}_{batter}.csv",
+                            "text": pitch_type.to_csv()}],
+            'renderable': pdf_to_clean_html(pitch_type)
+        },
+    ]
+
     return results
 
 
 def validate_inputs(inputs):
     # date parameters alredy evaluated by webapp.
-    inputs = inputs["pitching"]
-    ew = {"pitching": {'errors': {}, 'warnings': {}}}
-    pitcher = inputs["pitcher"]
-    if not pitcher:
-        return ew
-    pitcher = pitcher[0]
-    choices = get_choices()
-    if pitcher not in choices["choices"]:
-        ew["pitching"]["errors"] = {"pitcher": f"pitcher {pitcher} not allowed"}
+    inputs = inputs["matchup"]
+    ew = {"matchup": {'errors': {}, 'warnings': {}}}
+    for pos in ["pitcher", "batter"]:
+        player = inputs[pos]
+        if not player:
+            continue
+        player = player[0]
+        choices = get_choices()
+        if player not in choices["choices"]:
+            ew["matchup"]["errors"] = {pos: f"player \"{player}\" not allowed"}
     return ew
 
-def parse_inputs(inputs):
+def parse_inputs(use_2018, inputs):
     ew = validate_inputs(inputs)
-    return (inputs, {"pitching": json.dumps(inputs)}, ew)
+    return (inputs, {"matchup": json.dumps(inputs)}, ew)
