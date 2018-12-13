@@ -125,8 +125,8 @@ def validate_inputs(inputs):
     inputs = inputs["matchup"]
     ew = {"matchup": {'errors': {}, 'warnings': {}}}
     for pos in ["pitcher", "batter"]:
-        player = inputs[pos]
-        if not player:
+        player = inputs.get(pos, None)
+        if player is None:
             continue
         player = player[0]
         choices = get_choices()
