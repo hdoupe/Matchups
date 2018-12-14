@@ -23,60 +23,64 @@ def pdf_to_clean_html(pdf):
             .replace(' style="text-align: right;"', ''))
 
 
-def get_matchup(**kwargs):
+def get_matchup(use_2018, user_mods):
+    config = user_mods["matchup"]
     defaults = get_inputs()
     specs = {}
     for param in defaults["matchup"]:
-        if kwargs.get(param, None) is not None:
-            specs[param] = kwargs[param][0] # comp params are lists right now.
+        if config.get(param, None) is not None:
+            specs[param] = config[param][0] # comp params are lists right now.
         else:
             specs[param] = defaults["matchup"][param]["value"]
-    print("getting data according to: ", specs)
+    print("getting data according to: ", use_2018, specs)
     results = {'outputs': [], 'aggr_outputs': [], 'meta': {"task_times": [0]}}
-    use_2018 = kwargs["use_2018"]
     if use_2018:
         url = "https://s3.amazonaws.com/hank-statcast/statcast2018.parquet"
     else:
         url = "https://s3.amazonaws.com/hank-statcast/statcast.parquet"
     print(f"reading data from {url}")
-    scallcols = pd.read_parquet(url, engine="pyarrow")
-    cols2keep = ["player_name", "batter_name", "pitch_type",
-                "game_date", "release_speed", "events",
-                "launch_speed", "woba_value", "bb_type",
-                "balls", "strikes", "outs_when_up",
-                "at_bat_number", "type"]
-    scall = scallcols.loc[:, cols2keep]
+    scall = pd.read_parquet(url, engine="pyarrow")
+    print('data read')
     scall["date"] = pd.to_datetime(scall["game_date"])
     sc = scall.loc[(scall.date >= specs["start_date"]) & (scall.date < specs["end_date"])]
-
+    del scall
+    print('filtered by date')
     pitcher, batter = specs["pitcher"], specs["batter"]
     gb = sc.loc[(sc["player_name"]==pitcher) & (sc["batter_name"]==batter), :].groupby(
         ["balls", "strikes"])
     pitch_outcome_normalized = pd.DataFrame(gb["type"].value_counts(normalize=True))
     pitch_outcome = pd.DataFrame(gb["type"].value_counts())
+    del gb
+    print('groupby1')
 
     gb = sc.loc[(sc["player_name"]==pitcher) & (sc["batter_name"]==batter), :].groupby(
         ["balls", "strikes"])
     pitch_type_normalized = pd.DataFrame(gb["pitch_type"].value_counts(normalize=True))
     pitch_type = pd.DataFrame(gb["pitch_type"].value_counts())
+    del gb
+    print('groupby2')
 
-    agg_gb = sc.groupby(
+    gb = sc.groupby(
         ["balls", "strikes"])
     agg_pitch_outcome_normalized = pd.DataFrame(gb["type"].value_counts(normalize=True))
+    del gb
+    print('groupby3')
 
-    agg_gb = sc.groupby(
+    gb = sc.groupby(
         ["balls", "strikes"])
     agg_pitch_type_normalized = pd.DataFrame(gb["pitch_type"].value_counts(normalize=True))
-
+    del gb
+    del sc
+    print('groupby4')
 
     results['aggr_outputs'].append({
-        'tags': {'attribute': 'pitch outcome'},
+        'tags': {'attribute': 'pitch-outcome'},
         'title': 'Pitch outcome by count for all players',
         'downloadable': [{'filename': 'pitch_outcome.csv',
                           'text': agg_pitch_outcome_normalized.to_csv()}],
         'renderable': pdf_to_clean_html(agg_pitch_outcome_normalized)})
     results['aggr_outputs'].append({
-        'tags': {'attribute': 'pitch type'},
+        'tags': {'attribute': 'pitch-type'},
         'title': 'Pitch type by count for all players',
         'downloadable': [{'filename': 'pitch_type.csv',
                           'text': agg_pitch_type_normalized.to_csv()}],
@@ -85,7 +89,7 @@ def get_matchup(**kwargs):
     results["outputs"] = [
         {
             "dimension": "",
-            "tags": {"attribute": "pitch outcome", "count": "normalized"},
+            "tags": {"attribute": "pitch-outcome", "count": "normalized"},
             'title': f'Normalized pitch outcome by count for {pitcher} v. {batter}',
             'downloadable': [{'filename': f"normalized_pitch_outcome_{pitcher}_{batter}.csv",
                               "text": pitch_outcome_normalized.to_csv()}],
@@ -93,7 +97,7 @@ def get_matchup(**kwargs):
         },
         {
             "dimension": "",
-            "tags": {"attribute": "pitch outcome", "count": "raw count"},
+            "tags": {"attribute": "pitch-outcome", "count": "raw-count"},
             'title': f'Pitch outcome by count for {pitcher} v. {batter}',
             'downloadable': [{'filename': f"pitch_outcome_{pitcher}_{batter}.csv",
                               "text": pitch_outcome.to_csv()}],
@@ -101,7 +105,7 @@ def get_matchup(**kwargs):
         },
         {
             "dimension": "",
-            "tags": {"attribute": "pitch type", "count": "normalized"},
+            "tags": {"attribute": "pitch-type", "count": "normalized"},
             'title': f'Normalized pitch type by count for {pitcher} v. {batter}',
             'downloadable': [{'filename': f"normalized_pitch_type_{pitcher}_{batter}.csv",
                               "text": pitch_type_normalized.to_csv()}],
@@ -109,7 +113,7 @@ def get_matchup(**kwargs):
         },
         {
             "dimension": "",
-            "tags": {"attribute": "pitch type", "count": "raw count"},
+            "tags": {"attribute": "pitch-type", "count": "raw-count"},
             'title': f'Pitch type by count for {pitcher} v. {batter}',
             'downloadable': [{'filename': f"pitch_type{pitcher}_{batter}.csv",
                             "text": pitch_type.to_csv()}],
