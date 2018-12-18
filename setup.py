@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="compbaseball",
-    version="0.0.1",
+    version="0.1.4",
     author="Hank Doupe",
     author_email="henrymdoupe@gmail.com",
     description="Documents COMP via baseball data examples.",
@@ -13,6 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/hdoupe/compbaseball",
     packages=setuptools.find_packages(),
+    include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
