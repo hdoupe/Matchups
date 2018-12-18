@@ -29,7 +29,7 @@ def get_matchup(use_2018, user_mods):
     specs = {}
     for param in defaults["matchup"]:
         if config.get(param, None) is not None:
-            specs[param] = config[param][0] # comp params are lists right now.
+            specs[param] = config[param]
         else:
             specs[param] = defaults["matchup"][param]["value"]
     print("getting data according to: ", use_2018, specs)
@@ -139,6 +139,8 @@ def validate_inputs(inputs):
         players = inputs.get(pos, None)
         if players is None:
             continue
+        if not isinstance(players, list):
+            players = [players]
         for player in players:
             choices = get_choices()
             if player not in choices["choices"]:

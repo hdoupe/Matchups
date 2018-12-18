@@ -7,6 +7,7 @@
         "notes": "Be careful to not specify too long of a date range.",
         "col_var": "",
         "col_label": [""],
+        "number_dims": 0,
         "type": "date",
         "value": "2018-01-01"
     },
@@ -18,6 +19,7 @@
         "notes": "Be careful to not specify too long of a date range.",
         "col_var": "",
         "col_label": [""],
+        "number_dims": 0,
         "type": "date",
         "value": "2018-11-10"
     },
@@ -29,6 +31,7 @@
         "notes": "Make sure the name of the pitcher is correct. A good place to reference this is baseball-reference.com",
         "col_var": "",
         "col_label": [""],
+        "number_dims": 0,
         "type": "str",
         "value": "Clayton Kershaw"
     },
@@ -40,6 +43,7 @@
         "notes": "Make sure the name of the batter is correct. A good place to reference this is baseball-reference.com",
         "col_var": "",
         "col_label": [""],
+        "number_dims": 1,
         "type": "str",
         "value": ["Freddie Freeman", "Jose Altuve"]
     }
