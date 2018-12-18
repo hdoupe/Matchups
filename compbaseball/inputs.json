@@ -41,6 +41,6 @@
         "col_var": "",
         "col_label": [""],
         "type": "str",
-        "value": "Freddie Freeman"
+        "value": ["Freddie Freeman", "Jose Altuve"]
     }
 }
