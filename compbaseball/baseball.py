@@ -3,11 +3,9 @@ import os
 
 import pandas as pd
 
-from bokeh.plotting import figure
-from bokeh.resources import CDN
-from bokeh.embed import file_html
 
 CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
+
 
 def get_choices():
     with open(os.path.join(CURRENT_PATH, "playerchoices.json")) as f:
@@ -72,20 +70,6 @@ def get_matchup(use_2018, user_mods):
         'downloadable': [{'filename': 'pitch_type.csv',
                           'text': agg_pitch_type_normalized.to_csv()}],
         'renderable': pdf_to_clean_html(agg_pitch_type_normalized)})
-
-    fb = sc.loc[sc.pitch_type=="FF", :]
-    p = figure(plot_width=400, plot_height=400)
-
-    # add a circle renderer with a size, color, and alpha
-    p.circle(fb.date, fb.release_speed, size=0.5, color="navy", alpha=0.5)
-
-    html = file_html(p, CDN, "my plot")
-
-    results['aggr_outputs'].append({
-        'tags': {'attribute': 'plot'},
-        'title': 'Plot',
-        'downloadable': [],
-        'renderable': html})
 
 
     pitcher, batters = specs["pitcher"], specs["batter"]
