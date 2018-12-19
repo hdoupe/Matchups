@@ -12,7 +12,7 @@ def get_choices():
         return json.loads(f.read())
 
 
-def get_inputs():
+def get_inputs(use_2018=True):
     with open(os.path.join(CURRENT_PATH, "inputs.json")) as f:
         return {"matchup": json.loads(f.read())}
 
@@ -146,9 +146,9 @@ def validate_inputs(inputs):
         for player in players:
             choices = get_choices()
             if player not in choices["choices"]:
-                ew["matchup"]["errors"] = {pos: f"player \"{player}\" not allowed"}
+                ew["matchup"]["errors"] = {pos: f"ERROR: player \"{player}\" not allowed"}
     return ew
 
-def parse_inputs(use_2018, inputs):
+def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
     ew = validate_inputs(inputs)
     return (inputs, {"matchup": json.dumps(inputs)}, ew)
