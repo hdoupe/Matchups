@@ -2,8 +2,8 @@
     "start_date": {
         "long_name": "Start Date",
         "description": "Date to start pulling statcast information",
-        "section_1": "Parameters",
-        "section_2": "Date",
+        "section_1": "Date",
+        "section_2": "",
         "notes": "Be careful to not specify too long of a date range.",
         "col_var": "",
         "col_label": [""],
@@ -14,8 +14,8 @@
     "end_date": {
         "long_name": "End Date",
         "description": "Date to quit pulling statcast information",
-        "section_1": "Parameters",
-        "section_2": "Date",
+        "section_1": "Date",
+        "section_2": "",
         "notes": "Be careful to not specify too long of a date range.",
         "col_var": "",
         "col_label": [""],
@@ -26,7 +26,7 @@
     "pitcher": {
         "long_name": "Pitcher Name",
         "description": "Name of pitcher to pull data on",
-        "section_1": "Parameters",
+        "section_1": "Players",
         "section_2": "Pitcher",
         "notes": "Make sure the name of the pitcher is correct. A good place to reference this is baseball-reference.com",
         "col_var": "",
@@ -38,7 +38,7 @@
     "batter": {
         "long_name": "Batter Name",
         "description": "Name of batter to pull data on",
-        "section_1": "Parameters",
+        "section_1": "Players",
         "section_2": "Batter",
         "notes": "Make sure the name of the batter is correct. A good place to reference this is baseball-reference.com",
         "col_var": "",
