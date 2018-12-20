@@ -3,18 +3,60 @@ import os
 
 import pandas as pd
 
+from paramtools.parameters import Parameters
+from marshmallow import ValidationError
 
 CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-def get_choices():
-    with open(os.path.join(CURRENT_PATH, "playerchoices.json")) as f:
-        return json.loads(f.read())
+class BaseballParams(Parameters):
+    schema = os.path.join(CURRENT_PATH, "schema.json")
+    defaults = os.path.join(CURRENT_PATH, "defaults.json")
+
+    def post_validate_pitcher(self):
+        with open(os.path.join(CURRENT_PATH, "playerchoices.json")) as f:
+            choices = json.loads(f.read())
+        pitcher = self.get("pitcher")[0]["value"]
+        errors = []
+        if pitcher not in choices["choices"]:
+            errors = [f"ERROR: Pitcher \"{pitcher}\" not allowed."]
+            raise ValidationError({"pitcher": errors})
+
+    def post_validate_batter(self):
+        with open(os.path.join(CURRENT_PATH, "playerchoices.json")) as f:
+            choices = json.loads(f.read())
+        batters = self.get("batter")[0]["value"]
+        errors = []
+        for batter in batters:
+            if batter not in choices["choices"]:
+                errors.append(f"ERROR: Batter \"{batter}\" not allowed.")
+        if errors:
+            raise ValidationError({"batter": errors})
 
 
 def get_inputs(use_2018=True):
-    with open(os.path.join(CURRENT_PATH, "inputs.json")) as f:
-        return {"matchup": json.loads(f.read())}
+    params = BaseballParams()
+    return params.specification()
+
+
+def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
+    adjustments = inputs["matchup"]
+    params = BaseballParams()
+    try:
+        params.adjust(adjustments)
+    except ValidationError as ve:
+        errors_warnings["matchup"]["errors"].update(ve.messages)
+    try:
+        params.post_validate_batter()
+    except ValidationError as ve:
+        errors_warnings["matchup"]["errors"].update(ve.messages)
+    try:
+        params.post_validate_pitcher()
+    except ValidationError as ve:
+        errors_warnings["matchup"]["errors"].update(ve.messages)
+
+    import pdb; pdb.set_trace()
+    return (inputs, {"matchup": json.dumps(inputs)}, errors_warnings)
 
 
 def pdf_to_clean_html(pdf):
@@ -133,22 +175,19 @@ def get_matchup(use_2018, user_mods):
     return results
 
 
-def validate_inputs(inputs):
-    # date parameters alredy evaluated by webapp.
-    inputs = inputs["matchup"]
-    ew = {"matchup": {'errors': {}, 'warnings': {}}}
-    for pos in ["pitcher", "batter"]:
-        players = inputs.get(pos, None)
-        if players is None:
-            continue
-        if not isinstance(players, list):
-            players = [players]
-        for player in players:
-            choices = get_choices()
-            if player not in choices["choices"]:
-                ew["matchup"]["errors"] = {pos: f"ERROR: player \"{player}\" not allowed"}
-    return ew
+# def validate_inputs(inputs):
+#     # date parameters alredy evaluated by webapp.
+#     inputs = inputs["matchup"]
+#     ew = {"matchup": {'errors': {}, 'warnings': {}}}
+#     for pos in ["pitcher", "batter"]:
+#         players = inputs.get(pos, None)
+#         if players is None:
+#             continue
+#         if not isinstance(players, list):
+#             players = [players]
+#         for player in players:
+#             choices = get_choices()
+#             if player not in choices["choices"]:
+#                 ew["matchup"]["errors"] = {pos: f"ERROR: player \"{player}\" not allowed"}
+#     return ew
 
-def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
-    ew = validate_inputs(inputs)
-    return (inputs, {"matchup": json.dumps(inputs)}, ew)
