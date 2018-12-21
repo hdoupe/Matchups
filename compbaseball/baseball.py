@@ -151,4 +151,4 @@ def validate_inputs(inputs):
 
 def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
     ew = validate_inputs(inputs)
-    return (inputs, {"matchup": json.dumps(inputs)}, ew)
+    return (inputs, {"matchup": json.dumps(inputs, indent=4)}, ew)
