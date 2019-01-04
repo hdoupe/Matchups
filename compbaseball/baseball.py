@@ -3,13 +3,8 @@ import os
 
 import pandas as pd
 
-
-CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
-
-
-def get_choices():
-    with open(os.path.join(CURRENT_PATH, "playerchoices.json")) as f:
-        return json.loads(f.read())
+from compbaseball.utils import (CURRENT_PATH, renamedf,
+                                validate_inputs, pdf_to_clean_html)
 
 
 def get_inputs(use_2018=True):
@@ -17,12 +12,9 @@ def get_inputs(use_2018=True):
         return {"matchup": json.loads(f.read())}
 
 
-def pdf_to_clean_html(pdf):
-    """Takes a PDF and returns an HTML table without any deprecated tags or
-    irrelevant styling"""
-    return (pdf.to_html()
-            .replace(' border="1"', '')
-            .replace(' style="text-align: right;"', ''))
+def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
+    ew = validate_inputs(inputs)
+    return (inputs, {"matchup": json.dumps(inputs, indent=4)}, ew)
 
 
 def get_matchup(use_2018, user_mods):
@@ -50,12 +42,18 @@ def get_matchup(use_2018, user_mods):
 
     gb = sc.groupby(
         ["balls", "strikes"])
-    agg_pitch_outcome_normalized = pd.DataFrame(gb["type"].value_counts(normalize=True))
+    agg_pitch_outcome_normalized = renamedf(
+        pd.DataFrame(gb["type"].value_counts(normalize=True)),
+        normalized=True
+    )
     del gb
 
     gb = sc.groupby(
         ["balls", "strikes"])
-    agg_pitch_type_normalized = pd.DataFrame(gb["pitch_type"].value_counts(normalize=True))
+    agg_pitch_type_normalized = renamedf(
+        pd.DataFrame(gb["pitch_type"].value_counts(normalize=True)),
+        normalized=True
+    )
     del gb
 
     results['aggr_outputs'].append({
@@ -84,14 +82,26 @@ def get_matchup(use_2018, user_mods):
         else:
             gb = pdf.loc[(pdf["player_name"]==pitcher) & (pdf["batter_name"]==batter), :].groupby(
                 ["balls", "strikes"])
-            pitch_outcome_normalized = pd.DataFrame(gb["type"].value_counts(normalize=True))
-            pitch_outcome = pd.DataFrame(gb["type"].value_counts())
+            pitch_outcome_normalized = renamedf(
+                pd.DataFrame(gb["type"].value_counts(normalize=True)),
+                normalized=True
+            )
+            pitch_outcome = renamedf(
+                pd.DataFrame(gb["type"].value_counts()),
+                normalized=False
+            )
             del gb
 
             gb = pdf.loc[(pdf["player_name"]==pitcher) & (pdf["batter_name"]==batter), :].groupby(
                 ["balls", "strikes"])
-            pitch_type_normalized = pd.DataFrame(gb["pitch_type"].value_counts(normalize=True))
-            pitch_type = pd.DataFrame(gb["pitch_type"].value_counts())
+            pitch_type_normalized = renamedf(
+                pd.DataFrame(gb["pitch_type"].value_counts(normalize=True)),
+                normalized=True
+            )
+            pitch_type = renamedf(
+                pd.DataFrame(gb["pitch_type"].value_counts()),
+                normalized=False
+            )
             del gb
             del pdf
 
@@ -131,24 +141,3 @@ def get_matchup(use_2018, user_mods):
         ]
     del sc
     return results
-
-
-def validate_inputs(inputs):
-    # date parameters alredy evaluated by webapp.
-    inputs = inputs["matchup"]
-    ew = {"matchup": {'errors': {}, 'warnings': {}}}
-    for pos in ["pitcher", "batter"]:
-        players = inputs.get(pos, None)
-        if players is None:
-            continue
-        if not isinstance(players, list):
-            players = [players]
-        for player in players:
-            choices = get_choices()
-            if player not in choices["choices"]:
-                ew["matchup"]["errors"] = {pos: f"ERROR: player \"{player}\" not allowed"}
-    return ew
-
-def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
-    ew = validate_inputs(inputs)
-    return (inputs, {"matchup": json.dumps(inputs, indent=4)}, ew)
