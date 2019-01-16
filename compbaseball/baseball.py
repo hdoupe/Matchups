@@ -13,16 +13,24 @@ class BaseballParams(Parameters):
     schema = os.path.join(CURRENT_PATH, "schema.json")
     defaults = os.path.join(CURRENT_PATH, "defaults.json")
 
-    def post_validate_pitcher(self):
+    def post_validate(self, raise_errors=True):
+        self.post_validate_pitcher(raise_errors=raise_errors)
+        self.post_validate_batter(raise_errors=raise_errors)
+
+    def post_validate_pitcher(self, raise_errors=True):
         with open(os.path.join(CURRENT_PATH, "playerchoices.json")) as f:
             choices = json.loads(f.read())
         pitcher = self.get("pitcher")[0]["value"]
         errors = []
         if pitcher not in choices["choices"]:
             errors = [f"ERROR: Pitcher \"{pitcher}\" not allowed."]
-            raise ValidationError({"pitcher": errors})
+            ve = ValidationError({"pitcher": errors})
+            if raise_errors:
+                raise ve
+            else:
+                self.format_errors(ve)
 
-    def post_validate_batter(self):
+    def post_validate_batter(self, raise_errors=True):
         with open(os.path.join(CURRENT_PATH, "playerchoices.json")) as f:
             choices = json.loads(f.read())
         batters = self.get("batter")[0]["value"]
@@ -31,31 +39,25 @@ class BaseballParams(Parameters):
             if batter not in choices["choices"]:
                 errors.append(f"ERROR: Batter \"{batter}\" not allowed.")
         if errors:
-            raise ValidationError({"batter": errors})
+            ve = ValidationError({"batter": errors})
+            if raise_errors:
+                raise ve
+            else:
+                self.format_errors(ve)
 
 
 def get_inputs(use_2018=True):
     params = BaseballParams()
-    return params.specification()
+    spec = params.specification(meta_data=True, use_2018=use_2018)
+    return {"matchup": spec}
 
 
 def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
     adjustments = inputs["matchup"]
     params = BaseballParams()
-    try:
-        params.adjust(adjustments)
-    except ValidationError as ve:
-        errors_warnings["matchup"]["errors"].update(ve.messages)
-    try:
-        params.post_validate_batter()
-    except ValidationError as ve:
-        errors_warnings["matchup"]["errors"].update(ve.messages)
-    try:
-        params.post_validate_pitcher()
-    except ValidationError as ve:
-        errors_warnings["matchup"]["errors"].update(ve.messages)
-
-    import pdb; pdb.set_trace()
+    params.adjust(adjustments, raise_errors=False)
+    params.post_validate()
+    errors_warnings["matchup"]["errors"].update(params.errors)
     return (inputs, {"matchup": json.dumps(inputs)}, errors_warnings)
 
 
@@ -68,14 +70,10 @@ def pdf_to_clean_html(pdf):
 
 
 def get_matchup(use_2018, user_mods):
-    config = user_mods["matchup"]
-    defaults = get_inputs()
-    specs = {}
-    for param in defaults["matchup"]:
-        if config.get(param, None) is not None:
-            specs[param] = config[param]
-        else:
-            specs[param] = defaults["matchup"][param]["value"]
+    adjustment = user_mods["matchup"]
+    params = BaseballParams()
+    params.adjust(adjustment)
+    specs = params.specification(use_2018=use_2018)
     print("getting data according to: ", use_2018, specs)
     results = {'outputs': [], 'aggr_outputs': [], 'meta': {"task_times": [0]}}
     if use_2018:
@@ -86,7 +84,8 @@ def get_matchup(use_2018, user_mods):
     scall = pd.read_parquet(url, engine="pyarrow")
     print('data read')
     scall["date"] = pd.to_datetime(scall["game_date"])
-    sc = scall.loc[(scall.date >= specs["start_date"]) & (scall.date < specs["end_date"])]
+    sc = scall.loc[(scall.date >= pd.Timestamp(specs["start_date"][0]["value"])) &
+                   (scall.date < pd.Timestamp(specs["end_date"][0]["value"]))]
     del scall
     print('filtered by date')
 
@@ -114,7 +113,7 @@ def get_matchup(use_2018, user_mods):
         'renderable': pdf_to_clean_html(agg_pitch_type_normalized)})
 
 
-    pitcher, batters = specs["pitcher"], specs["batter"]
+    pitcher, batters = specs["pitcher"][0]["value"], specs["batter"][0]["value"]
     for batter in batters:
         print(pitcher, batter)
         pdf = sc.loc[(sc["player_name"]==pitcher) & (sc["batter_name"]==batter), :]
@@ -173,21 +172,3 @@ def get_matchup(use_2018, user_mods):
         ]
     del sc
     return results
-
-
-# def validate_inputs(inputs):
-#     # date parameters alredy evaluated by webapp.
-#     inputs = inputs["matchup"]
-#     ew = {"matchup": {'errors': {}, 'warnings': {}}}
-#     for pos in ["pitcher", "batter"]:
-#         players = inputs.get(pos, None)
-#         if players is None:
-#             continue
-#         if not isinstance(players, list):
-#             players = [players]
-#         for player in players:
-#             choices = get_choices()
-#             if player not in choices["choices"]:
-#                 ew["matchup"]["errors"] = {pos: f"ERROR: player \"{player}\" not allowed"}
-#     return ew
-

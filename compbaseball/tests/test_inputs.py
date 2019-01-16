@@ -6,9 +6,10 @@ def test_BaseballParams():
 
 def test_update_params():
     params = baseball.BaseballParams()
-    params.adjust({"batter": [{"value": ["Alex Rodriguez"]}]})
+    adj = {"batter": [{'use_2018': False, "value": ["Alex Rodriguez"]}]}
+    params.adjust(adj)
     params.post_validate_batter()
-    assert params.get("batter") == [{"value": ["Alex Rodriguez"]}]
+    assert params.get("batter", use_2018=False) == adj["batter"]
 
 def test_parse_inputs():
     adj = {"matchup": {"batter": [{"value": ["Alex Rodriguez"]}]}}
@@ -16,7 +17,11 @@ def test_parse_inputs():
     r = baseball.parse_inputs(adj, "", ew, True)
 
 def test_parse_bad_inputs():
-    adj = {"matchup": {"batter": [{"value": [1, "Alex Rodriguez", "fake batter"]}]}}
+    adj = {
+        "matchup": {
+            "batter": [{"value": [1, "Alex Rodriguez", "fake batter"]}],
+            "pitcher": 1234,
+        }
+    }
     ew = {"matchup": {"errors": {}, "warnings": {}}}
     res = baseball.parse_inputs(adj, "", ew, True)
-
