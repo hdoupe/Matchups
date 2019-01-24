@@ -1,12 +1,12 @@
-from compbaseball import baseball
+from matchups import matchups
 
 def test_get_inputs():
-    assert baseball.get_inputs()
+    assert matchups.get_inputs()
 
 def test_parse_inputs():
     adj = {"matchup": {"batter": ["Alex Rodriguez"]}}
     ew = {"matchup": {"errors": {}, "warnings": {}}}
-    r = baseball.parse_inputs(adj, "", ew, True)
+    r = matchups.parse_inputs(adj, "", ew, True)
     assert r
 
 def test_get_matchup():
@@ -18,4 +18,4 @@ def test_get_matchup():
             "batter": ["Freddie Freeman", "David Wright"]
         }
     }
-    baseball.get_matchup(use_2018, user_mods)
+    matchups.get_matchup(use_2018, user_mods)

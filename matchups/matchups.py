@@ -3,7 +3,7 @@ import os
 
 import pandas as pd
 
-from compbaseball.utils import (CURRENT_PATH, renamedf,
+from matchups.utils import (CURRENT_PATH, renamedf,
                                 validate_inputs, pdf_to_clean_html)
 
 

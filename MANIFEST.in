@@ -1,2 +1,2 @@
-include compbaseball/inputs.json
-include compbaseball/playerchoices.json
+include matchups/inputs.json
+include matchups/playerchoices.json
