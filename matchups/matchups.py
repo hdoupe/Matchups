@@ -3,8 +3,8 @@ import os
 
 import pandas as pd
 
-from matchups.utils import (CURRENT_PATH, renamedf,
-                                validate_inputs, pdf_to_clean_html)
+from matchups import (CURRENT_PATH, renamedf,
+                      validate_inputs, pdf_to_clean_html)
 
 
 def get_inputs(use_2018=True):

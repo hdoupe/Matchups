@@ -1,12 +1,12 @@
-from matchups import matchups
+from matchups import get_inputs, parse_inputs, get_matchup
 
 def test_get_inputs():
-    assert matchups.get_inputs()
+    assert get_inputs()
 
 def test_parse_inputs():
     adj = {"matchup": {"batter": ["Alex Rodriguez"]}}
     ew = {"matchup": {"errors": {}, "warnings": {}}}
-    r = matchups.parse_inputs(adj, "", ew, True)
+    r = parse_inputs(adj, "", ew, True)
     assert r
 
 def test_get_matchup():
@@ -18,4 +18,4 @@ def test_get_matchup():
             "batter": ["Freddie Freeman", "David Wright"]
         }
     }
-    matchups.get_matchup(use_2018, user_mods)
+    assert get_matchup(use_2018, user_mods)
