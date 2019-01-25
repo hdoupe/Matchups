@@ -5,14 +5,14 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="compbaseball",
+    name="matchups",
     version=os.environ.get("VERSION", "0.0.0"),
     author="Hank Doupe",
     author_email="henrymdoupe@gmail.com",
-    description="Documents COMP via baseball data examples.",
+    description="Provides pitch data on pitcher and batter matchups.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/hdoupe/compbaseball",
+    url="https://github.com/hdoupe/Matchups",
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=["paramtools"],

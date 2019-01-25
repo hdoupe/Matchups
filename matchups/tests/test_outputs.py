@@ -1,4 +1,5 @@
-from compbaseball import baseball
+import matchups
+
 
 def test_get_matchup():
     data = {
@@ -7,4 +8,4 @@ def test_get_matchup():
                         'use_2018': False}]
         }
     }
-    assert baseball.get_matchup(False, data)
+    assert matchups.get_matchup(False, data)

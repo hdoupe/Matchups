@@ -6,14 +6,20 @@ import pandas as pd
 from paramtools.parameters import Parameters
 from marshmallow import ValidationError
 
+from matchups.utils import (CURRENT_PATH, renamedf, pdf_to_clean_html)
+
 CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-class BaseballParams(Parameters):
+class MatchupsParams(Parameters):
     schema = os.path.join(CURRENT_PATH, "schema.json")
     defaults = os.path.join(CURRENT_PATH, "defaults.json")
 
     def post_validate(self, raise_errors=True):
+        """
+        Do custom validation to make sure that the pitcher and batter(s) are
+        in playerchoices.json
+        """
         self.post_validate_pitcher(raise_errors=raise_errors)
         self.post_validate_batter(raise_errors=raise_errors)
 
@@ -47,31 +53,23 @@ class BaseballParams(Parameters):
 
 
 def get_inputs(use_2018=True):
-    params = BaseballParams()
+    params = MatchupsParams()
     spec = params.specification(meta_data=True, use_2018=use_2018)
     return {"matchup": spec}
 
 
 def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
     adjustments = inputs["matchup"]
-    params = BaseballParams()
+    params = MatchupsParams()
     params.adjust(adjustments, raise_errors=False)
     params.post_validate()
     errors_warnings["matchup"]["errors"].update(params.errors)
     return (inputs, {"matchup": json.dumps(inputs)}, errors_warnings)
 
 
-def pdf_to_clean_html(pdf):
-    """Takes a PDF and returns an HTML table without any deprecated tags or
-    irrelevant styling"""
-    return (pdf.to_html()
-            .replace(' border="1"', '')
-            .replace(' style="text-align: right;"', ''))
-
-
 def get_matchup(use_2018, user_mods):
     adjustment = user_mods["matchup"]
-    params = BaseballParams()
+    params = MatchupsParams()
     params.adjust(adjustment)
     specs = params.specification(use_2018=use_2018)
     print("getting data according to: ", use_2018, specs)
@@ -91,12 +89,18 @@ def get_matchup(use_2018, user_mods):
 
     gb = sc.groupby(
         ["balls", "strikes"])
-    agg_pitch_outcome_normalized = pd.DataFrame(gb["type"].value_counts(normalize=True))
+    agg_pitch_outcome_normalized = renamedf(
+        pd.DataFrame(gb["type"].value_counts(normalize=True)),
+        normalized=True
+    )
     del gb
 
     gb = sc.groupby(
         ["balls", "strikes"])
-    agg_pitch_type_normalized = pd.DataFrame(gb["pitch_type"].value_counts(normalize=True))
+    agg_pitch_type_normalized = renamedf(
+        pd.DataFrame(gb["pitch_type"].value_counts(normalize=True)),
+        normalized=True
+    )
     del gb
 
     results['aggr_outputs'].append({
@@ -125,14 +129,26 @@ def get_matchup(use_2018, user_mods):
         else:
             gb = pdf.loc[(pdf["player_name"]==pitcher) & (pdf["batter_name"]==batter), :].groupby(
                 ["balls", "strikes"])
-            pitch_outcome_normalized = pd.DataFrame(gb["type"].value_counts(normalize=True))
-            pitch_outcome = pd.DataFrame(gb["type"].value_counts())
+            pitch_outcome_normalized = renamedf(
+                pd.DataFrame(gb["type"].value_counts(normalize=True)),
+                normalized=True
+            )
+            pitch_outcome = renamedf(
+                pd.DataFrame(gb["type"].value_counts()),
+                normalized=False
+            )
             del gb
 
             gb = pdf.loc[(pdf["player_name"]==pitcher) & (pdf["batter_name"]==batter), :].groupby(
                 ["balls", "strikes"])
-            pitch_type_normalized = pd.DataFrame(gb["pitch_type"].value_counts(normalize=True))
-            pitch_type = pd.DataFrame(gb["pitch_type"].value_counts())
+            pitch_type_normalized = renamedf(
+                pd.DataFrame(gb["pitch_type"].value_counts(normalize=True)),
+                normalized=True
+            )
+            pitch_type = renamedf(
+                pd.DataFrame(gb["pitch_type"].value_counts()),
+                normalized=False
+            )
             del gb
             del pdf
 

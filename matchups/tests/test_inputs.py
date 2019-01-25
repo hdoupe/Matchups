@@ -1,20 +1,21 @@
-from compbaseball import baseball
+import matchups
 
-def test_BaseballParams():
-    params = baseball.BaseballParams()
+
+def test_MatchupsParams():
+    params = matchups.MatchupsParams()
     assert params
 
 def test_update_params():
-    params = baseball.BaseballParams()
+    params = matchups.MatchupsParams()
     adj = {"batter": [{'use_2018': False, "value": ["Alex Rodriguez"]}]}
     params.adjust(adj)
-    params.post_validate_batter()
+    params.post_validate()
     assert params.get("batter", use_2018=False) == adj["batter"]
 
 def test_parse_inputs():
     adj = {"matchup": {"batter": [{"value": ["Alex Rodriguez"]}]}}
     ew = {"matchup": {"errors": {}, "warnings": {}}}
-    r = baseball.parse_inputs(adj, "", ew, True)
+    r = matchups.parse_inputs(adj, "", ew, True)
 
 def test_parse_bad_inputs():
     adj = {
@@ -24,4 +25,4 @@ def test_parse_bad_inputs():
         }
     }
     ew = {"matchup": {"errors": {}, "warnings": {}}}
-    res = baseball.parse_inputs(adj, "", ew, True)
+    res = matchups.parse_inputs(adj, "", ew, True)

@@ -1,3 +1,3 @@
-# COMP Baseball package
+# Matchups
 
-An entertaining way to document COMP and demonstrate its abilities
+Provides pitch data on pitcher and batter matchups.
