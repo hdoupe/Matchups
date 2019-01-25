@@ -25,4 +25,15 @@ def test_parse_bad_inputs():
         }
     }
     ew = {"matchup": {"errors": {}, "warnings": {}}}
-    res = matchups.parse_inputs(adj, "", ew, True)
+    params, jsonstr, ew = matchups.parse_inputs(adj, "", ew, True)
+    assert ew["matchup"]["errors"]["batter"] == ['Not a valid string.']
+
+    adj = {
+        "matchup": {
+            "batter": [{"value": ["Alex Rodriguez", "fake batter"]}],
+        }
+    }
+    ew = {"matchup": {"errors": {}, "warnings": {}}}
+    params, jsonstr, ew = matchups.parse_inputs(adj, "", ew, True)
+    exp = ['ERROR: Batter "fake batter" not allowed.']
+    assert ew["matchup"]["errors"]["batter"] == exp

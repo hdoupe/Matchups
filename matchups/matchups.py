@@ -62,7 +62,7 @@ def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
     adjustments = inputs["matchup"]
     params = MatchupsParams()
     params.adjust(adjustments, raise_errors=False)
-    params.post_validate()
+    params.post_validate(raise_errors=False)
     errors_warnings["matchup"]["errors"].update(params.errors)
     return (inputs, {"matchup": json.dumps(inputs)}, errors_warnings)
 
