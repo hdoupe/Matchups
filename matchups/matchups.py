@@ -15,42 +15,6 @@ class MatchupsParams(Parameters):
     schema = os.path.join(CURRENT_PATH, "schema.json")
     defaults = os.path.join(CURRENT_PATH, "defaults.json")
 
-    def post_validate(self, raise_errors=True):
-        """
-        Do custom validation to make sure that the pitcher and batter(s) are
-        in playerchoices.json
-        """
-        self.post_validate_pitcher(raise_errors=raise_errors)
-        self.post_validate_batter(raise_errors=raise_errors)
-
-    def post_validate_pitcher(self, raise_errors=True):
-        with open(os.path.join(CURRENT_PATH, "playerchoices.json")) as f:
-            choices = json.loads(f.read())
-        pitcher = self.get("pitcher")[0]["value"]
-        errors = []
-        if pitcher not in choices["choices"]:
-            errors = [f"ERROR: Pitcher \"{pitcher}\" not allowed."]
-            ve = ValidationError({"pitcher": errors})
-            if raise_errors:
-                raise ve
-            else:
-                self.format_errors(ve)
-
-    def post_validate_batter(self, raise_errors=True):
-        with open(os.path.join(CURRENT_PATH, "playerchoices.json")) as f:
-            choices = json.loads(f.read())
-        batters = self.get("batter")[0]["value"]
-        errors = []
-        for batter in batters:
-            if batter not in choices["choices"]:
-                errors.append(f"ERROR: Batter \"{batter}\" not allowed.")
-        if errors:
-            ve = ValidationError({"batter": errors})
-            if raise_errors:
-                raise ve
-            else:
-                self.format_errors(ve)
-
 
 def get_inputs(use_2018=True):
     params = MatchupsParams()
@@ -62,7 +26,6 @@ def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
     adjustments = inputs["matchup"]
     params = MatchupsParams()
     params.adjust(adjustments, raise_errors=False)
-    params.post_validate(raise_errors=False)
     errors_warnings["matchup"]["errors"].update(params.errors)
     return (inputs, {"matchup": json.dumps(inputs)}, errors_warnings)
 

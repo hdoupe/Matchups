@@ -9,7 +9,6 @@ def test_update_params():
     params = matchups.MatchupsParams()
     adj = {"batter": [{'use_2018': False, "value": ["Alex Rodriguez"]}]}
     params.adjust(adj)
-    params.post_validate()
     assert params.get("batter", use_2018=False) == adj["batter"]
 
 def test_parse_inputs():
@@ -21,12 +20,13 @@ def test_parse_bad_inputs():
     adj = {
         "matchup": {
             "batter": [{"value": [1, "Alex Rodriguez", "fake batter"]}],
-            "pitcher": 1234,
+            "pitcher": [{"value": 1234}],
         }
     }
     ew = {"matchup": {"errors": {}, "warnings": {}}}
     params, jsonstr, ew = matchups.parse_inputs(adj, "", ew, True)
-    assert ew["matchup"]["errors"]["batter"] == ['Not a valid string.']
+    assert ew["matchup"]["errors"]["batter"] == ['Not a valid string: 1.']
+    assert ew["matchup"]["errors"]["pitcher"] == ["Not a valid string: 1234."]
 
     adj = {
         "matchup": {
@@ -35,5 +35,5 @@ def test_parse_bad_inputs():
     }
     ew = {"matchup": {"errors": {}, "warnings": {}}}
     params, jsonstr, ew = matchups.parse_inputs(adj, "", ew, True)
-    exp = ['ERROR: Batter "fake batter" not allowed.']
+    exp = ['batter "fake batter" must be in list of choices for dimensions .']
     assert ew["matchup"]["errors"]["batter"] == exp
