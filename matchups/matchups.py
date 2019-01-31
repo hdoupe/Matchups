@@ -3,29 +3,38 @@ import os
 
 import pandas as pd
 
-from matchups.utils import (CURRENT_PATH, renamedf,
-                                validate_inputs, pdf_to_clean_html)
+from paramtools.parameters import Parameters
+from marshmallow import ValidationError
+
+from matchups.utils import (CURRENT_PATH, renamedf, pdf_to_clean_html)
+
+CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
+
+
+class MatchupsParams(Parameters):
+    schema = os.path.join(CURRENT_PATH, "schema.json")
+    defaults = os.path.join(CURRENT_PATH, "defaults.json")
 
 
 def get_inputs(use_2018=True):
-    with open(os.path.join(CURRENT_PATH, "inputs.json")) as f:
-        return {"matchup": json.loads(f.read())}
+    params = MatchupsParams()
+    spec = params.specification(meta_data=True, use_2018=use_2018)
+    return {"matchup": spec}
 
 
 def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
-    ew = validate_inputs(inputs)
-    return (inputs, {"matchup": json.dumps(inputs, indent=4)}, ew)
+    adjustments = inputs["matchup"]
+    params = MatchupsParams()
+    params.adjust(adjustments, raise_errors=False)
+    errors_warnings["matchup"]["errors"].update(params.errors)
+    return (inputs, {"matchup": json.dumps(inputs)}, errors_warnings)
 
 
 def get_matchup(use_2018, user_mods):
-    config = user_mods["matchup"]
-    defaults = get_inputs()
-    specs = {}
-    for param in defaults["matchup"]:
-        if config.get(param, None) is not None:
-            specs[param] = config[param]
-        else:
-            specs[param] = defaults["matchup"][param]["value"]
+    adjustment = user_mods["matchup"]
+    params = MatchupsParams()
+    params.adjust(adjustment)
+    specs = params.specification(use_2018=use_2018)
     print("getting data according to: ", use_2018, specs)
     results = {'outputs': [], 'aggr_outputs': [], 'meta': {"task_times": [0]}}
     if use_2018:
@@ -36,7 +45,8 @@ def get_matchup(use_2018, user_mods):
     scall = pd.read_parquet(url, engine="pyarrow")
     print('data read')
     scall["date"] = pd.to_datetime(scall["game_date"])
-    sc = scall.loc[(scall.date >= specs["start_date"]) & (scall.date < specs["end_date"])]
+    sc = scall.loc[(scall.date >= pd.Timestamp(specs["start_date"][0]["value"])) &
+                   (scall.date < pd.Timestamp(specs["end_date"][0]["value"]))]
     del scall
     print('filtered by date')
 
@@ -70,7 +80,7 @@ def get_matchup(use_2018, user_mods):
         'renderable': pdf_to_clean_html(agg_pitch_type_normalized)})
 
 
-    pitcher, batters = specs["pitcher"], specs["batter"]
+    pitcher, batters = specs["pitcher"][0]["value"], specs["batter"][0]["value"]
     for batter in batters:
         print(pitcher, batter)
         pdf = sc.loc[(sc["player_name"]==pitcher) & (sc["batter_name"]==batter), :]

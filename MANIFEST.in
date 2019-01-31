@@ -1,2 +1,2 @@
-include matchups/inputs.json
-include matchups/playerchoices.json
+include matchups/schema.json
+include matchups/defaults.json

@@ -45,20 +45,3 @@ def renamedf(df, normalized=True):
             col_map[oldname] = newname.format(op=op)
 
     return df.rename(columns=col_map)
-
-
-def validate_inputs(inputs):
-    # date parameters alredy evaluated by webapp.
-    inputs = inputs["matchup"]
-    ew = {"matchup": {'errors': {}, 'warnings': {}}}
-    for pos in ["pitcher", "batter"]:
-        players = inputs.get(pos, None)
-        if players is None:
-            continue
-        if not isinstance(players, list):
-            players = [players]
-        for player in players:
-            choices = get_choices()
-            if player not in choices["choices"]:
-                ew["matchup"]["errors"] = {pos: f"ERROR: player \"{player}\" not allowed"}
-    return ew
