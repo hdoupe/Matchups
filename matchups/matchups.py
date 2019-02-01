@@ -16,28 +16,28 @@ class MatchupsParams(Parameters):
     defaults = os.path.join(CURRENT_PATH, "defaults.json")
 
 
-def get_inputs(use_2018=True):
+def get_inputs(use_full_data=True):
     params = MatchupsParams()
-    spec = params.specification(meta_data=True, use_2018=use_2018)
+    spec = params.specification(meta_data=True, use_full_data=use_full_data)
     return {"matchup": spec}
 
 
-def parse_inputs(inputs, jsonparams, errors_warnings, use_2018=True):
+def parse_inputs(inputs, jsonparams, errors_warnings, use_full_data=True):
     adjustments = inputs["matchup"]
     params = MatchupsParams()
     params.adjust(adjustments, raise_errors=False)
     errors_warnings["matchup"]["errors"].update(params.errors)
-    return (inputs, {"matchup": json.dumps(inputs)}, errors_warnings)
+    return (inputs, {"matchup": json.dumps(inputs, indent=4)}, errors_warnings)
 
 
-def get_matchup(use_2018, user_mods):
+def get_matchup(use_full_data, user_mods):
     adjustment = user_mods["matchup"]
     params = MatchupsParams()
     params.adjust(adjustment)
-    specs = params.specification(use_2018=use_2018)
-    print("getting data according to: ", use_2018, specs)
+    specs = params.specification(use_full_data=use_full_data)
+    print("getting data according to: ", use_full_data, specs)
     results = {'outputs': [], 'aggr_outputs': [], 'meta': {"task_times": [0]}}
-    if use_2018:
+    if use_full_data:
         url = "https://s3.amazonaws.com/hank-statcast/statcast2018.parquet"
     else:
         url = "https://s3.amazonaws.com/hank-statcast/statcast.parquet"
@@ -50,7 +50,9 @@ def get_matchup(use_2018, user_mods):
     del scall
     print('filtered by date')
 
-    gb = sc.groupby(
+    pitcher, batters = specs["pitcher"][0]["value"], specs["batter"][0]["value"]
+    pvall = sc.loc[sc["player_name"]==pitcher, :]
+    gb = pvall.groupby(
         ["balls", "strikes"])
     agg_pitch_outcome_normalized = renamedf(
         pd.DataFrame(gb["type"].value_counts(normalize=True)),
@@ -58,29 +60,29 @@ def get_matchup(use_2018, user_mods):
     )
     del gb
 
-    gb = sc.groupby(
+    gb = pvall.groupby(
         ["balls", "strikes"])
     agg_pitch_type_normalized = renamedf(
         pd.DataFrame(gb["pitch_type"].value_counts(normalize=True)),
         normalized=True
     )
     del gb
+    del pvall
 
     results['aggr_outputs'].append({
         'tags': {'attribute': 'pitch-outcome'},
-        'title': 'Pitch outcome by count for all players',
+        'title': f'Pitch outcome by count for {pitcher} versus all players',
         'downloadable': [{'filename': 'pitch_outcome.csv',
                           'text': agg_pitch_outcome_normalized.to_csv()}],
         'renderable': pdf_to_clean_html(agg_pitch_outcome_normalized)})
     results['aggr_outputs'].append({
         'tags': {'attribute': 'pitch-type'},
-        'title': 'Pitch type by count for all players',
+        'title': f'Pitch type by count for {pitcher} versus all players',
         'downloadable': [{'filename': 'pitch_type.csv',
                           'text': agg_pitch_type_normalized.to_csv()}],
         'renderable': pdf_to_clean_html(agg_pitch_type_normalized)})
 
 
-    pitcher, batters = specs["pitcher"][0]["value"], specs["batter"][0]["value"]
     for batter in batters:
         print(pitcher, batter)
         pdf = sc.loc[(sc["player_name"]==pitcher) & (sc["batter_name"]==batter), :]
