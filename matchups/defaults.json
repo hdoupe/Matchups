@@ -36,8 +36,8 @@
         "type": "str",
         "number_dims": 0,
         "value": [
-            {"use_full_data": true, "value": "Mariano Rivera"},
-            {"use_full_data": false, "value": "Clayton Kershaw"}
+            {"use_full_data": true, "value": "Clayton Kershaw"},
+            {"use_full_data": false, "value": "Jacob deGrom"}
         ],
         "validators": {"choice": {
             "choices": [
