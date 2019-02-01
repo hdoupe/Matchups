@@ -52,18 +52,29 @@ def get_matchup(use_full_data, user_mods):
 
     pitcher, batters = specs["pitcher"][0]["value"], specs["batter"][0]["value"]
     pvall = sc.loc[sc["player_name"]==pitcher, :]
-    gb = pvall.groupby(
-        ["balls", "strikes"])
+    print("pvall", pvall)
+    if len(pvall) == 0:
+        gb = pd.DataFrame()
+    else:
+        gb = (pd.DataFrame(pvall.groupby(
+            ["balls", "strikes"])["type"]
+            .value_counts(normalize=True)
+            ))
     agg_pitch_outcome_normalized = renamedf(
-        pd.DataFrame(gb["type"].value_counts(normalize=True)),
+        gb,
         normalized=True
     )
     del gb
 
-    gb = pvall.groupby(
-        ["balls", "strikes"])
+    if len(pvall) == 0:
+        gb = pd.DataFrame()
+    else:
+        gb = (pd.DataFrame(pvall.groupby(
+            ["balls", "strikes"])["pitch_type"]
+            .value_counts(normalize=True)
+            ))
     agg_pitch_type_normalized = renamedf(
-        pd.DataFrame(gb["pitch_type"].value_counts(normalize=True)),
+        gb,
         normalized=True
     )
     del gb
