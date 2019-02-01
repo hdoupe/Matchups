@@ -8,8 +8,8 @@
         "type": "date",
         "number_dims": 0,
         "value": [
-            {"use_full_data": false, "value": "2008-01-01"},
-            {"use_full_data": true, "value": "2018-01-01"}
+            {"use_full_data": true, "value": "2008-01-01"},
+            {"use_full_data": false, "value": "2018-01-01"}
         ],
         "validators": {"date_range": {"min": "2008-01-01", "max": "end_date"}}
     },
@@ -22,8 +22,8 @@
         "type": "date",
         "number_dims": 0,
         "value": [
-            {"use_full_data": false, "value": "2018-11-10"},
-            {"use_full_data": true, "value": "2018-11-10"}
+            {"use_full_data": true, "value": "2018-11-10"},
+            {"use_full_data": false, "value": "2018-11-10"}
         ],
         "validators": {"date_range": {"min": "2008-01-01", "max": "2018-11-10"}}
     },
@@ -36,8 +36,8 @@
         "type": "str",
         "number_dims": 0,
         "value": [
-            {"use_full_data": false, "value": "Mariano Rivera"},
-            {"use_full_data": true, "value": "Clayton Kershaw"}
+            {"use_full_data": true, "value": "Mariano Rivera"},
+            {"use_full_data": false, "value": "Clayton Kershaw"}
         ],
         "validators": {"choice": {
             "choices": [
@@ -19664,8 +19664,8 @@
         "type": "str",
         "number_dims": 1,
         "value": [
-            {"use_full_data": false, "value": ["Chipper Jones", "David Ortiz"]},
-            {"use_full_data": true, "value": ["Freddie Freeman", "Bryce Harper"]}
+            {"use_full_data": true, "value": ["Chipper Jones", "David Ortiz"]},
+            {"use_full_data": false, "value": ["Freddie Freeman", "Bryce Harper"]}
         ],
         "validators": {"choice": {
             "choices": [
@@ -21248,7 +21248,7 @@
                 "Dick Bokelmann",
                 "Bob Boken",
                 "Joe Bokina",
-                NaN,
+
                 "Bernie Boland",
                 "Ed Boland",
                 "Charlie Bold",
@@ -21316,7 +21316,7 @@
                 "Luke Boone",
                 "Ray Boone",
                 "Chris Bootcheck",
-                NaN,
+
                 "Amos Booth",
                 "Eddie Booth",
                 "Josh Booty",
@@ -22401,7 +22401,7 @@
                 "Matias Carrillo",
                 "Lew Carr",
                 "Brett Carroll",
-                NaN,
+
                 "Cliff Carroll",
                 "Clay Carroll",
                 "Cody Carroll",
@@ -24667,7 +24667,7 @@
                 "Jim Edmonds",
                 "Paul Edmondson",
                 "Sam Edmonston",
-                NaN,
+
                 "Bruce Edwards",
                 "Carl Edwards",
                 "Dave Edwards",
@@ -24906,7 +24906,7 @@
                 "Ferd Eunick",
                 "Tony Eusebio",
                 "Frank Eustace",
-                NaN,
+
                 "Al Evans",
                 "Art Evans",
                 "Barry Evans",
@@ -25477,7 +25477,7 @@
                 "Terry Francona",
                 "Tito Francona",
                 "Kevin Frandsen",
-                NaN,
+
                 "Charlie Frank",
                 "Fred Frank",
                 "Fred Frankhouse",
@@ -25887,7 +25887,7 @@
                 "Kevin Gausman",
                 "Doc Gautreau",
                 "Sid Gautreaux",
-                NaN,
+
                 "Sam Gaviglio",
                 "Chippy Gaw",
                 "Mike Gazella",
@@ -27013,7 +27013,7 @@
                 "Slim Harrell",
                 "Andy Harrington",
                 "Andy Harrington",
-                NaN,
+
                 "Ben Harris",
                 "Bill Harris",
                 "Bill Harrington",
@@ -27286,7 +27286,7 @@
                 "Hank Helf",
                 "Ty Helfrich",
                 "Ben Heller",
-                NaN,
+
                 "Jeremy Hellickson",
                 "Rick Helling",
                 "Tony Hellman",
@@ -27538,7 +27538,7 @@
                 "Kyle Higashioka",
                 "Kirby Higbe",
                 "Mahlon Higbee",
-                NaN,
+
                 "Bill Higdon",
                 "Bill Higgins",
                 "Bob Higgins",
@@ -27557,7 +27557,7 @@
                 "Teddy Higuera",
                 "John Hiland",
                 "Whitey Hilcher",
-                NaN,
+
                 "George Hildebrand",
                 "Oral Hildebrand",
                 "Palmer Hildebrand",
@@ -28516,8 +28516,8 @@
                 "Smead Jolley",
                 "Dave Jolly",
                 "Levin Jones",
-                NaN,
-                NaN,
+
+
                 "Adam Jones",
                 "Alex Jones",
                 "Al Jones",
@@ -29786,7 +29786,7 @@
                 "Ed Lennon",
                 "Pat Lennon",
                 "Jim Lentine",
-                NaN,
+
                 "Andy Leonard",
                 "Buck Leonard",
                 "Dennis Leonard",
@@ -29847,7 +29847,7 @@
                 "Dennis Lewallyn",
                 "Dan Lewandowski",
                 "Artie Lewicki",
-                NaN,
+
                 "Allan Lewis",
                 "Bert Lewis",
                 "Bill Lewis",
@@ -30314,7 +30314,7 @@
                 "Harvey MacDonald",
                 "Mike MacDougal",
                 "Harry Mace",
-                NaN,
+
                 "Danny MacFayden",
                 "Mike Macfarlane",
                 "Ed MacGamwell",
@@ -30945,7 +30945,7 @@
                 "Bake McBride",
                 "Dick McBride",
                 "George McBride",
-                NaN,
+
                 "Ken McBride",
                 "Macay McBride",
                 "Matt McBride",
@@ -31099,7 +31099,7 @@
                 "John McDonald",
                 "Keith McDonald",
                 "Tex McDonald",
-                NaN,
+
                 "Dewey McDougal",
                 "Gil McDougald",
                 "Marshall McDougall",
@@ -31359,7 +31359,7 @@
                 "Brian McRae",
                 "Hal McRae",
                 "Norm McRae",
-                NaN,
+
                 "Kevin McReynolds",
                 "Pete McShannic",
                 "Trick McSorley",
@@ -32227,7 +32227,7 @@
                 "Wilbur Murdoch",
                 "Red Murff",
                 "Tim Murnane",
-                NaN,
+
                 "Billy Murphy",
                 "Bill Murphy",
                 "Bob Murphy",
@@ -32900,7 +32900,6 @@
                 "Jess Orndorff",
                 "Eddie Oropesa",
                 "Jesse Orosco",
-                NaN,
                 "Jim O'Rourke",
                 "Frank O'Rourke",
                 "Jim O'Rourke",
@@ -33628,7 +33627,7 @@
                 "Gracie Pierce",
                 "Jack Pierce",
                 "Jeff Pierce",
-                NaN,
+
                 "Ray Pierce",
                 "Tony Pierce",
                 "Marino Pieretti",
@@ -33992,7 +33991,7 @@
                 "Hal Quick",
                 "Frank Quilici",
                 "Lee Quillin",
-                NaN,
+
                 "Finners Quinlan",
                 "Frank Quinlan",
                 "Robb Quinlan",
@@ -34004,7 +34003,7 @@
                 "Joe Quinn",
                 "John Quinn",
                 "Mark Quinn",
-                NaN,
+
                 "Paddy Quinn",
                 "Roman Quinn",
                 "Tad Quinn",
@@ -34431,7 +34430,7 @@
                 "Pat Rice",
                 "Sam Rice",
                 "Scott Rice",
-                NaN,
+
                 "Antoan Richardson",
                 "Bill Richardson",
                 "Bobby Richardson",
@@ -35549,7 +35548,7 @@
                 "Jim Scoggins",
                 "Daryl Sconiers",
                 "Herb Score",
-                NaN,
+
                 "Darryl Scott",
                 "Dick Scott",
                 "Dick Scott",
@@ -35703,7 +35702,7 @@
                 "Justin Shafer",
                 "Ralph Shafer",
                 "Tillie Shafer",
-                NaN,
+
                 "Frank Shaffer",
                 "John Shaffer",
                 "Orator Shafer",
@@ -35809,7 +35808,7 @@
                 "John Sheppard",
                 "Bill Sherdel",
                 "Jimmie Sherfy",
-                NaN,
+
                 "Neill Sheridan",
                 "Pat Sheridan",
                 "Red Sheridan",
@@ -36077,7 +36076,7 @@
                 "Joe Smaza",
                 "Bill Smiley",
                 "John Smiley",
-                NaN,
+
                 "Aleck Smith",
                 "Al Smith",
                 "Al Smith",
@@ -36398,7 +36397,7 @@
                 "Justin Speier",
                 "Ryan Speier",
                 "Levale Speigner",
-                NaN,
+
                 "Ben Spencer",
                 "Bob Spence",
                 "Chet Spencer",
@@ -36470,7 +36469,7 @@
                 "Eddie Stack",
                 "Marv Staehle",
                 "Bill Stafford",
-                NaN,
+
                 "General Stafford",
                 "Heinie Stafford",
                 "John Stafford",
@@ -36623,7 +36622,7 @@
                 "Robert Stephenson",
                 "Vern Stephens",
                 "Walter Stephenson",
-                NaN,
+
                 "Randy Sterling",
                 "Adam Stern",
                 "Dutch Sterrett",
@@ -36695,7 +36694,7 @@
                 "Phil Stockman",
                 "Robert Stock",
                 "Wes Stock",
-                NaN,
+
                 "Bob Stoddard",
                 "Tim Stoddard",
                 "Al Stokes",
@@ -36857,7 +36856,7 @@
                 "Ed Sukla",
                 "Guy Sularz",
                 "Ernie Sulik",
-                NaN,
+
                 "Andy Sullivan",
                 "Bill Sullivan",
                 "Bill Sullivan",
@@ -36985,7 +36984,7 @@
                 "Ryan Sweeney",
                 "Les Sweetland",
                 "Rick Sweet",
-                NaN,
+
                 "Augie Swentor",
                 "Steve Swetonic",
                 "Pop Swett",
@@ -38732,7 +38731,7 @@
                 "Woody Williams",
                 "Claude Willoughby",
                 "Jim Willoughby",
-                NaN,
+
                 "Bump Wills",
                 "Dave Wills",
                 "Frank Wills",
@@ -38931,7 +38930,7 @@
                 "Sid Womack",
                 "Tony Womack",
                 "Kolten Wong",
-                NaN,
+
                 "Brad Woodall",
                 "Darrell Woodard",
                 "Alex Wood",
