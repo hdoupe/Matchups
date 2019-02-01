@@ -13,7 +13,7 @@ def test_get_matchup():
 def test_get_matchup_empty():
     data = {
         'matchup': {
-            'batter': [{'value': ['Ty Cobb'],
+            'pitcher': [{'value': 'Babe Ruth',
                         'use_full_data': False}]
         }
     }
