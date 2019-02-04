@@ -19664,8 +19664,8 @@
         "type": "str",
         "number_dims": 1,
         "value": [
-            {"use_full_data": true, "value": ["Chipper Jones", "David Ortiz"]},
-            {"use_full_data": false, "value": ["Freddie Freeman", "Bryce Harper"]}
+            {"use_full_data": true, "value": ["Freddie Freeman", "Bryce Harper"]},
+            {"use_full_data": false, "value": ["Giancarlo Stanton", "Kris Bryant"]}
         ],
         "validators": {"choice": {
             "choices": [

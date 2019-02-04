@@ -82,7 +82,7 @@ def get_matchup(use_full_data, user_mods):
 
     results['aggr_outputs'].append({
         'tags': {'attribute': 'pitch-outcome'},
-        'title': f'Pitch outcome by count for {pitcher} versus all players',
+        'title': f'Pitch outcome by count for {pitcher} v. all players',
         'downloadable': [{'filename': 'pitch_outcome.csv',
                           'text': agg_pitch_outcome_normalized.to_csv()}],
         'renderable': pdf_to_clean_html(agg_pitch_outcome_normalized)})
