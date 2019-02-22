@@ -9,7 +9,8 @@ def test_update_params():
     params = matchups.MatchupsParams()
     adj = {"batter": [{'use_full_data': False, "value": ["Alex Rodriguez"]}]}
     params.adjust(adj)
-    assert params.get("batter", use_full_data=False) == adj["batter"]
+    params.set_state(use_full_data=False)
+    assert params.batter == adj["batter"]
 
 def test_parse_inputs():
     adj = {"matchup": {"batter": [{"value": ["Alex Rodriguez"]}]}}

@@ -33,9 +33,9 @@ def parse_inputs(inputs, jsonparams, errors_warnings, use_full_data=True):
 def get_matchup(use_full_data, user_mods):
     adjustment = user_mods["matchup"]
     params = MatchupsParams()
+    params.set_state(use_full_data=use_full_data)
     params.adjust(adjustment)
-    specs = params.specification(use_full_data=use_full_data)
-    print("getting data according to: ", use_full_data, specs)
+    print("getting data according to: ", use_full_data, params.specification())
     results = {'outputs': [], 'aggr_outputs': [], 'meta': {"task_times": [0]}}
     if use_full_data:
         url = "https://s3.amazonaws.com/hank-statcast/statcast2018.parquet"
@@ -45,12 +45,12 @@ def get_matchup(use_full_data, user_mods):
     scall = pd.read_parquet(url, engine="pyarrow")
     print('data read')
     scall["date"] = pd.to_datetime(scall["game_date"])
-    sc = scall.loc[(scall.date >= pd.Timestamp(specs["start_date"][0]["value"])) &
-                   (scall.date < pd.Timestamp(specs["end_date"][0]["value"]))]
+    sc = scall.loc[(scall.date >= pd.Timestamp(params.start_date[0]["value"])) &
+                   (scall.date < pd.Timestamp(params.end_date[0]["value"]))]
     del scall
     print('filtered by date')
 
-    pitcher, batters = specs["pitcher"][0]["value"], specs["batter"][0]["value"]
+    pitcher, batters = params.pitcher[0]["value"], params.batter[0]["value"]
     pvall = sc.loc[sc["player_name"]==pitcher, :]
     print("pvall", pvall)
     if len(pvall) == 0:
