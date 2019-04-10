@@ -38,11 +38,10 @@ def get_matchup(use_full_data, user_mods):
     print("getting data according to: ", use_full_data, params.specification())
     results = {'outputs': [], 'aggr_outputs': [], 'meta': {"task_times": [0]}}
     if use_full_data:
-        url = "https://s3.amazonaws.com/hank-statcast/statcast2018.parquet"
+        path = os.path.join(CURRENT_PATH, "statcast.parquet")
     else:
-        url = "https://s3.amazonaws.com/hank-statcast/statcast.parquet"
-    print(f"reading data from {url}")
-    scall = pd.read_parquet(url, engine="pyarrow")
+        path = os.path.join(CURRENT_PATH, "statcast2018.parquet")
+    scall = pd.read_parquet(path, engine="pyarrow")
     print('data read')
     scall["date"] = pd.to_datetime(scall["game_date"])
     sc = scall.loc[(scall.date >= pd.Timestamp(params.start_date[0]["value"])) &
