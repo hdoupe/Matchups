@@ -36,5 +36,5 @@ def test_parse_bad_inputs():
     }
     ew = {"matchup": {"errors": {}, "warnings": {}}}
     params, jsonstr, ew = matchups.parse_inputs(adj, "", ew, True)
-    exp = ['batter "fake batter" must be in list of choices for dimensions .']
+    exp = ['batter "fake batter" must be in list of choices.']
     assert ew["matchup"]["errors"]["batter"] == exp

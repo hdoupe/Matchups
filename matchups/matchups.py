@@ -1,6 +1,12 @@
 import json
 import os
 
+from bokeh.plotting import figure, show
+from bokeh.io import output_notebook
+from bokeh.models import ColumnDataSource
+from bokeh.transform import linear_cmap
+from bokeh.util.hex import hexbin
+from bokeh.embed import components
 import pandas as pd
 
 from paramtools.parameters import Parameters
@@ -10,6 +16,31 @@ from matchups.utils import (CURRENT_PATH, renamedf, pdf_to_clean_html)
 
 CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 
+
+def plot(df):
+    bins = hexbin(-df.plate_x.values, df.plate_z.values, 0.1)
+    p = figure(title="Matchups Plot", tools="wheel_zoom,pan,reset",
+               match_aspect=True, background_fill_color='#440154')
+    p.grid.visible = False
+    p.hex_tile(q="q", r="r", size=0.1, line_color=None, source=bins,
+            fill_color=linear_cmap('counts', 'Viridis256', 0, max(bins.counts)))
+    strike_zone_cds = ColumnDataSource({'x': [-8.5 / 12, 8.5 / 12],
+                                        'x_side1': [-8.5 / 12, -8.5 / 12],
+                                        'x_side2': [8.5 / 12, 8.5 / 12],
+                                        'top': [3.0, 3.0],
+                                        'bottom': [1.2, 1.2],
+                                        'side1': [3.0, 1.2],
+                                        'side2': [1.2, 3.0]})
+    p.line(x='x', y='top', line_width=3, color='red', source=strike_zone_cds)
+    p.line(x='x', y='bottom', line_width=3, color='red',
+            source=strike_zone_cds)
+    p.line(x='x_side1', y='side1', line_width=3, color='red',
+            source=strike_zone_cds)
+    p.line(x='x_side2', y='side2', line_width=3, color='red',
+    source=strike_zone_cds)
+
+    js, div = components(p)
+    return js, div
 
 class MatchupsParams(Parameters):
     schema = os.path.join(CURRENT_PATH, "schema.json")
@@ -41,125 +72,44 @@ def get_matchup(use_full_data, user_mods):
         path = os.path.join(CURRENT_PATH, "statcast.parquet")
     else:
         path = os.path.join(CURRENT_PATH, "statcast2018.parquet")
-    scall = pd.read_parquet(path, engine="pyarrow")
+    scall = pd.read_parquet(path, engine="fastparquet")
     print('data read')
     scall["date"] = pd.to_datetime(scall["game_date"])
     sc = scall.loc[(scall.date >= pd.Timestamp(params.start_date[0]["value"])) &
                    (scall.date < pd.Timestamp(params.end_date[0]["value"]))]
-    del scall
     print('filtered by date')
 
     pitcher, batters = params.pitcher[0]["value"], params.batter[0]["value"]
-    pvall = sc.loc[sc["player_name"]==pitcher, :]
-    print("pvall", pvall)
-    if len(pvall) == 0:
-        agg_pitch_outcome_normalized = pd.DataFrame()
-    else:
-        gb = (pd.DataFrame(pvall.groupby(
-            ["balls", "strikes"])["type"]
-            .value_counts(normalize=True)
-            ))
-        agg_pitch_outcome_normalized = renamedf(
-            gb,
-            normalized=True
-        )
-        del gb
-
-    if len(pvall) == 0:
-        agg_pitch_type_normalized = pd.DataFrame()
-    else:
-        gb = (pd.DataFrame(pvall.groupby(
-            ["balls", "strikes"])["pitch_type"]
-            .value_counts(normalize=True)
-            ))
-        agg_pitch_type_normalized = renamedf(
-            gb,
-            normalized=True
-        )
-        del gb
-    del pvall
-
-    results['aggr_outputs'].append({
-        'tags': {'attribute': 'pitch-outcome'},
-        'title': f'Pitch outcome by count for {pitcher} versus all players',
-        'downloadable': [{'filename': 'pitch_outcome.csv',
-                          'text': agg_pitch_outcome_normalized.to_csv()}],
-        'renderable': pdf_to_clean_html(agg_pitch_outcome_normalized)})
-    results['aggr_outputs'].append({
-        'tags': {'attribute': 'pitch-type'},
-        'title': f'Pitch type by count for {pitcher} versus all players',
-        'downloadable': [{'filename': 'pitch_type.csv',
-                          'text': agg_pitch_type_normalized.to_csv()}],
-        'renderable': pdf_to_clean_html(agg_pitch_type_normalized)})
-
-
+    renderable = []
+    downloadable = []
     for batter in batters:
-        print(pitcher, batter)
-        pdf = sc.loc[(sc["player_name"]==pitcher) & (sc["batter_name"]==batter), :]
+        pdf = sc.loc[(scall["player_name"]==pitcher) & (scall["batter_name"]==batter), :]
         if len(pdf) == 0:
-            pitch_outcome_normalized = pd.DataFrame()
-            pitch_outcome = pd.DataFrame()
-            pitch_type_normalized = pd.DataFrame()
-            pitch_type = pd.DataFrame()
+            js = ""
+            div = "<p><b>No matchups found for date range.</b></p>"
         else:
-            gb = pdf.loc[(pdf["player_name"]==pitcher) & (pdf["batter_name"]==batter), :].groupby(
-                ["balls", "strikes"])
-            pitch_outcome_normalized = renamedf(
-                pd.DataFrame(gb["type"].value_counts(normalize=True)),
-                normalized=True
-            )
-            pitch_outcome = renamedf(
-                pd.DataFrame(gb["type"].value_counts()),
-                normalized=False
-            )
-            del gb
-
-            gb = pdf.loc[(pdf["player_name"]==pitcher) & (pdf["batter_name"]==batter), :].groupby(
-                ["balls", "strikes"])
-            pitch_type_normalized = renamedf(
-                pd.DataFrame(gb["pitch_type"].value_counts(normalize=True)),
-                normalized=True
-            )
-            pitch_type = renamedf(
-                pd.DataFrame(gb["pitch_type"].value_counts()),
-                normalized=False
-            )
-            del gb
-            del pdf
-
-        results["outputs"] += [
+            js, div = plot(pdf)
+        renderable.append(
             {
-                "dimension": batter,
-                "tags": {"attribute": "pitch-outcome", "count": "normalized"},
-                'title': f'Normalized pitch outcome by count for {pitcher} v. {batter}',
-                'downloadable': [{'filename': f"normalized_pitch_outcome_{pitcher}_{batter}.csv",
-                                "text": pitch_outcome_normalized.to_csv()}],
-                'renderable': pdf_to_clean_html(pitch_outcome_normalized)
-            },
+                "media_type": "bokeh",
+                "title": f"{pitcher} v. {batter}",
+                "data": {
+                    "javascript": js,
+                    "html": div
+                }
+            }
+        )
+        downloadable.append(
             {
-                "dimension": batter,
-                "tags": {"attribute": "pitch-outcome", "count": "raw-count"},
-                'title': f'Pitch outcome by count for {pitcher} v. {batter}',
-                'downloadable': [{'filename': f"pitch_outcome_{pitcher}_{batter}.csv",
-                                "text": pitch_outcome.to_csv()}],
-                'renderable': pdf_to_clean_html(pitch_outcome)
-            },
-            {
-                "dimension": batter,
-                "tags": {"attribute": "pitch-type", "count": "normalized"},
-                'title': f'Normalized pitch type by count for {pitcher} v. {batter}',
-                'downloadable': [{'filename': f"normalized_pitch_type_{pitcher}_{batter}.csv",
-                                "text": pitch_type_normalized.to_csv()}],
-                'renderable': pdf_to_clean_html(pitch_type_normalized)
-            },
-            {
-                "dimension": batter,
-                "tags": {"attribute": "pitch-type", "count": "raw-count"},
-                'title': f'Pitch type by count for {pitcher} v. {batter}',
-                'downloadable': [{'filename': f"pitch_type{pitcher}_{batter}.csv",
-                                "text": pitch_type.to_csv()}],
-                'renderable': pdf_to_clean_html(pitch_type)
-            },
-        ]
-    del sc
-    return results
+                "media_type": "CSV",
+                "title": f"{pitcher} v. {batter}",
+                "data": {
+                    "CSV": pdf.to_csv()
+                }
+            }
+        )
+        del pdf
+    return {
+        "renderable": renderable,
+        "downloadable": downloadable
+    }

@@ -7,7 +7,7 @@ import pandas as pd
 # full statcast.csv.gzip file available upon request.
 
 people = pd.read_csv("people.csv")
-sc = pd.read_csv("statcast.csv.gzip", compression="gzip")
+sc = pd.read_parquet("statast_dump.parquet", engine="fastparquet")
 people["batter_name"] = people.name_first + " " + people.name_last
 merged = pd.merge(
     sc,
@@ -31,17 +31,14 @@ cols2keep = [
     "outs_when_up",
     "at_bat_number",
     "type",
+    "plate_x",
+    "plate_z",
+    "stand",
 ]
 sc = merged.loc[:, cols2keep]
 sc.to_parquet("statcast.parquet", engine="pyarrow")
-sc.to_parquet(
-    "https://s3.amazonaws.com/hank-statcast/statcast.parquet", engine="pyarrow"
-)
 
 sc["date"] = pd.to_datetime(merged["game_date"])
 recent = sc.loc[sc.date > "2018-01-01", :]
 recent.drop(columns=["date"], inplace=True)
 recent.to_parquet("statcast2018.parquet", engine="pyarrow")
-recent.to_parquet(
-    "https://s3.amazonaws.com/hank-statcast/statcast2018.parquet", engine="pyarrow"
-)
