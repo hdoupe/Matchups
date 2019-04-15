@@ -8,7 +8,7 @@ def test_get_matchup():
                         'use_full_data': False}]
         }
     }
-    assert matchups.get_matchup(False, data)
+    assert matchups.get_matchups(False, data)
 
 def test_get_matchup_empty():
     data = {
@@ -17,4 +17,4 @@ def test_get_matchup_empty():
                         'use_full_data': False}]
         }
     }
-    assert matchups.get_matchup(False, data)
+    assert matchups.get_matchups(False, data)
