@@ -7,6 +7,7 @@ from bokeh.models import ColumnDataSource
 from bokeh.transform import linear_cmap
 from bokeh.util.hex import hexbin
 from bokeh.embed import components
+from bokeh.palettes import d3
 import pandas as pd
 
 from paramtools.parameters import Parameters
@@ -19,11 +20,8 @@ CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 def plot(df):
     bins = hexbin(-df.plate_x.values, df.plate_z.values, 0.1)
-    p = figure(title="Matchups Plot", tools="wheel_zoom,pan,reset",
-               match_aspect=True, background_fill_color='#440154')
+    p = figure(title="", match_aspect=True)
     p.grid.visible = False
-    p.hex_tile(q="q", r="r", size=0.1, line_color=None, source=bins,
-            fill_color=linear_cmap('counts', 'Viridis256', 0, max(bins.counts)))
     strike_zone_cds = ColumnDataSource({'x': [-8.5 / 12, 8.5 / 12],
                                         'x_side1': [-8.5 / 12, -8.5 / 12],
                                         'x_side2': [8.5 / 12, 8.5 / 12],
@@ -38,9 +36,39 @@ def plot(df):
             source=strike_zone_cds)
     p.line(x='x_side2', y='side2', line_width=3, color='red',
     source=strike_zone_cds)
-
+    pitch_types = df.pitch_type.unique()
+    palette = d3["Category20"][max(3, pitch_types.shape[0])]
+    for ix, (pitch_type, df) in enumerate(df.groupby("pitch_type")):
+        p.circle(-df.plate_x, df.plate_z, legend=pitch_type, color=palette[ix], size=10, alpha=1)
     js, div = components(p)
     return js, div
+
+
+def append_output(df, title, renderable, downloadable):
+    if len(df) == 0:
+        js = ""
+        div = "<p><b>No matchups found.</b></p>"
+    else:
+        js, div = plot(df)
+    renderable.append(
+        {
+            "media_type": "bokeh",
+            "title": title,
+            "data": {
+                "javascript": js,
+                "html": div
+            }
+        }
+    )
+    downloadable.append(
+        {
+            "media_type": "CSV",
+            "title": title,
+            "data": {
+                "CSV": df.to_csv()
+            }
+        }
+    )
 
 class MatchupsParams(Parameters):
     schema = os.path.join(CURRENT_PATH, "schema.json")
@@ -83,56 +111,13 @@ def get_matchup(use_full_data, user_mods):
     renderable = []
     downloadable = []
     pitcher_df = sc.loc[(scall["player_name"]==pitcher), :]
-    if len(pitcher_df) == 0:
-        js = ""
-        div = "<p><b>No matchups found for date range.</b></p>"
-    else:
-        js, div = plot(pitcher_df)
-    renderable.append(
-        {
-            "media_type": "bokeh",
-            "title": f"{pitcher} v. All batters",
-            "data": {
-                "javascript": js,
-                "html": div
-            }
-        }
-    )
-    downloadable.append(
-        {
-            "media_type": "CSV",
-            "title": f"{pitcher} v. All batters",
-            "data": {
-                "CSV": pitcher_df.to_csv()
-            }
-        }
-    )
+    append_output(pitcher_df, f"{pitcher} v. All batters", renderable, downloadable)
+
     for batter in batters:
         batter_df = pitcher_df.loc[(scall["player_name"]==pitcher) & (scall["batter_name"]==batter), :]
-        if len(batter_df) == 0:
-            js = ""
-            div = "<p><b>No matchups found for date range.</b></p>"
-        else:
-            js, div = plot(batter_df)
-        renderable.append(
-            {
-                "media_type": "bokeh",
-                "title": f"{pitcher} v. {batter}",
-                "data": {
-                    "javascript": js,
-                    "html": div
-                }
-            }
-        )
-        downloadable.append(
-            {
-                "media_type": "CSV",
-                "title": f"{pitcher} v. {batter}",
-                "data": {
-                    "CSV": batter_df.to_csv()
-                }
-            }
-        )
+        append_output(batter_df, f"{pitcher} v. {batter}", renderable, downloadable)
+        for (balls, strikes), df in batter_df.groupby(["balls", "strikes"]):
+            append_output(df, f"{pitcher} v. {batter} (balls={balls}, strikes={strikes})", renderable, downloadable)
         del batter_df
     return {
         "renderable": renderable,
