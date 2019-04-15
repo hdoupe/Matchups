@@ -82,13 +82,38 @@ def get_matchup(use_full_data, user_mods):
     pitcher, batters = params.pitcher[0]["value"], params.batter[0]["value"]
     renderable = []
     downloadable = []
+    pitcher_df = sc.loc[(scall["player_name"]==pitcher), :]
+    if len(pitcher_df) == 0:
+        js = ""
+        div = "<p><b>No matchups found for date range.</b></p>"
+    else:
+        js, div = plot(pitcher_df)
+    renderable.append(
+        {
+            "media_type": "bokeh",
+            "title": f"{pitcher} v. All batters",
+            "data": {
+                "javascript": js,
+                "html": div
+            }
+        }
+    )
+    downloadable.append(
+        {
+            "media_type": "CSV",
+            "title": f"{pitcher} v. All batters",
+            "data": {
+                "CSV": pitcher_df.to_csv()
+            }
+        }
+    )
     for batter in batters:
-        pdf = sc.loc[(scall["player_name"]==pitcher) & (scall["batter_name"]==batter), :]
-        if len(pdf) == 0:
+        batter_df = pitcher_df.loc[(scall["player_name"]==pitcher) & (scall["batter_name"]==batter), :]
+        if len(batter_df) == 0:
             js = ""
             div = "<p><b>No matchups found for date range.</b></p>"
         else:
-            js, div = plot(pdf)
+            js, div = plot(batter_df)
         renderable.append(
             {
                 "media_type": "bokeh",
@@ -104,11 +129,11 @@ def get_matchup(use_full_data, user_mods):
                 "media_type": "CSV",
                 "title": f"{pitcher} v. {batter}",
                 "data": {
-                    "CSV": pdf.to_csv()
+                    "CSV": batter_df.to_csv()
                 }
             }
         )
-        del pdf
+        del batter_df
     return {
         "renderable": renderable,
         "downloadable": downloadable
