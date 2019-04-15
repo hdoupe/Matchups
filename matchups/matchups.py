@@ -61,7 +61,7 @@ def parse_inputs(inputs, jsonparams, errors_warnings, use_full_data=True):
     return (inputs, {"matchup": json.dumps(inputs, indent=4)}, errors_warnings)
 
 
-def get_matchups(use_full_data, user_mods):
+def get_matchup(use_full_data, user_mods):
     adjustment = user_mods["matchup"]
     params = MatchupsParams()
     params.set_state(use_full_data=use_full_data)
