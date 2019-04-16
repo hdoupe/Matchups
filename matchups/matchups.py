@@ -78,9 +78,7 @@ def append_output(df, title, renderable, downloadable):
         {
             "media_type": "CSV",
             "title": title,
-            "data": {
-                "CSV": df.to_csv()
-            }
+            "data": df.to_csv()
         }
     )
 
