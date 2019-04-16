@@ -2,12 +2,10 @@ import json
 import os
 
 from bokeh.plotting import figure, show
-from bokeh.io import output_notebook
 from bokeh.models import ColumnDataSource
-from bokeh.transform import linear_cmap
-from bokeh.util.hex import hexbin
 from bokeh.embed import components
 from bokeh.palettes import d3
+from bokeh.models.widgets import Tabs, Panel
 import pandas as pd
 
 from paramtools.parameters import Parameters
@@ -18,9 +16,8 @@ from matchups.utils import (CURRENT_PATH, renamedf, pdf_to_clean_html)
 CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-def plot(df):
-    bins = hexbin(-df.plate_x.values, df.plate_z.values, 0.1)
-    p = figure(title="", match_aspect=True)
+def count_plot(df, title):
+    p = figure(title=title, match_aspect=True)
     p.grid.visible = False
     strike_zone_cds = ColumnDataSource({'x': [-8.5 / 12, 8.5 / 12],
                                         'x_side1': [-8.5 / 12, -8.5 / 12],
@@ -39,9 +36,26 @@ def plot(df):
     pitch_types = df.pitch_type.unique()
     palette = d3["Category20"][max(3, pitch_types.shape[0])]
     for ix, (pitch_type, df) in enumerate(df.groupby("pitch_type")):
-        p.circle(-df.plate_x, df.plate_z, legend=pitch_type, color=palette[ix], size=10, alpha=1)
-    js, div = components(p)
-    return js, div
+        p.circle(-df.plate_x, df.plate_z, legend=pitch_type,
+                 color=palette[ix], size=10, alpha=1,
+                 muted_color=palette[ix], muted_alpha=0.2)
+    p.legend.click_policy = "hide"
+    return p
+
+def count_panels(df, main_title):
+    p = count_plot(df, main_title)
+    panels = [Panel(child=p, title="All counts")]
+
+    for (balls, strikes), df in df.groupby(["balls", "strikes"]):
+        panels.append(
+            Panel(
+                child=count_plot(df, f"{main_title} (balls={balls}, strikes={strikes})"),
+                title=f"{balls}-{strikes}"
+            )
+        )
+
+    tabs = Tabs(tabs=panels)
+    return tabs
 
 
 def append_output(df, title, renderable, downloadable):
@@ -49,7 +63,7 @@ def append_output(df, title, renderable, downloadable):
         js = ""
         div = "<p><b>No matchups found.</b></p>"
     else:
-        js, div = plot(df)
+        js, div = components(count_panels(df, title))
     renderable.append(
         {
             "media_type": "bokeh",
@@ -116,8 +130,6 @@ def get_matchup(use_full_data, user_mods):
     for batter in batters:
         batter_df = pitcher_df.loc[(scall["player_name"]==pitcher) & (scall["batter_name"]==batter), :]
         append_output(batter_df, f"{pitcher} v. {batter}", renderable, downloadable)
-        for (balls, strikes), df in batter_df.groupby(["balls", "strikes"]):
-            append_output(df, f"{pitcher} v. {batter} (balls={balls}, strikes={strikes})", renderable, downloadable)
         del batter_df
     return {
         "renderable": renderable,
