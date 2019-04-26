@@ -2,19 +2,19 @@ import matchups
 
 
 def test_get_matchup():
-    data = {
+    adj = {
         'matchup': {
             'batter': [{'value': ['Freddie Freeman', 'Yasiel Puig'],
                         'use_full_data': False}]
         }
     }
-    assert matchups.get_matchup(False, data)
+    assert matchups.get_matchup({"use_full_data": False}, adj)
 
 def test_get_matchup_empty():
-    data = {
+    adj = {
         'matchup': {
             'pitcher': [{'value': 'Babe Ruth',
                         'use_full_data': False}]
         }
     }
-    assert matchups.get_matchup(False, data)
+    assert matchups.get_matchup({"use_full_data": False}, adj)

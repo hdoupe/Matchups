@@ -8,7 +8,7 @@ from bokeh.palettes import d3
 from bokeh.models.widgets import Tabs, Panel
 import pandas as pd
 
-from paramtools.parameters import Parameters
+import paramtools
 from marshmallow import ValidationError
 
 from matchups.utils import (CURRENT_PATH, renamedf, pdf_to_clean_html)
@@ -82,33 +82,52 @@ def append_output(df, title, renderable, downloadable):
         }
     )
 
-class MatchupsParams(Parameters):
-    schema = os.path.join(CURRENT_PATH, "schema.json")
+
+class MetaParams(paramtools.Parameters):
+    array_first = True
+    defaults = {
+        "schema": {"labels": {}, "additional_parameters": {}},
+        "use_full_data": {
+            "title": "Use Full Data",
+            "description": "Flag that determines whether Matchups uses the 10 year data set or the 2018 data set.",
+            "type": "bool",
+            "value": True,
+            "validators": {}
+        }
+    }
+
+class MatchupsParams(paramtools.Parameters):
     defaults = os.path.join(CURRENT_PATH, "defaults.json")
 
 
-def get_inputs(use_full_data=True):
+
+def get_inputs(meta_params_dict):
+    meta_params = MetaParams()
+    meta_params.adjust(meta_params_dict)
     params = MatchupsParams()
-    spec = params.specification(meta_data=True, use_full_data=use_full_data)
+    spec = params.specification(
+        meta_data=True,
+        use_full_data=meta_params.use_full_data.tolist()
+    )
     return {"matchup": spec}
 
 
-def parse_inputs(inputs, jsonparams, errors_warnings, use_full_data=True):
-    adjustments = inputs["matchup"]
+def validate_inputs(meta_param_dict, adjustment, errors_warnings):
+    # matchups doesn't look at meta_param_dict for validating inputs.
     params = MatchupsParams()
-    params.adjust(adjustments, raise_errors=False)
+    params.adjust(adjustment["matchup"], raise_errors=False)
     errors_warnings["matchup"]["errors"].update(params.errors)
-    return (inputs, {"matchup": json.dumps(inputs, indent=4)}, errors_warnings)
+    return errors_warnings
 
 
-def get_matchup(use_full_data, user_mods):
-    adjustment = user_mods["matchup"]
+def get_matchup(meta_param_dict, adjustment):
+    meta_params = MetaParams()
+    meta_params.adjust(meta_param_dict)
     params = MatchupsParams()
-    params.set_state(use_full_data=use_full_data)
-    params.adjust(adjustment)
-    print("getting data according to: ", use_full_data, params.specification())
-    results = {'outputs': [], 'aggr_outputs': [], 'meta': {"task_times": [0]}}
-    if use_full_data:
+    params.set_state(use_full_data=meta_params.use_full_data.tolist())
+    params.adjust(adjustment["matchup"])
+    print("getting data according to: ", meta_params.specification(), params.specification())
+    if meta_params.use_full_data:
         path = os.path.join(CURRENT_PATH, "statcast.parquet")
     else:
         path = os.path.join(CURRENT_PATH, "statcast2018.parquet")
