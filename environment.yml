@@ -1,0 +1,15 @@
+name: matchups-dev
+channels:
+  - conda-forge
+dependencies:
+  - paramtools
+  - "python-dateutil>=2.8.0"
+  - pytest
+  - bokeh
+  - numpy
+  - pandas
+  - jupyter
+  - ipykernel
+  - pyarrow
+  - fastparquet
+  - python-snappy
