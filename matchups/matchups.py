@@ -86,15 +86,15 @@ def append_output(df, title, renderable, downloadable):
 class MetaParams(paramtools.Parameters):
     array_first = True
     defaults = {
-        "schema": {"labels": {}, "additional_parameters": {}},
         "use_full_data": {
             "title": "Use Full Data",
             "description": "Flag that determines whether Matchups uses the 10 year data set or the 2018 data set.",
             "type": "bool",
             "value": True,
-            "validators": {}
+            "validators": {"choice": {"choices": [True, False]}}
         }
     }
+
 
 class MatchupsParams(paramtools.Parameters):
     defaults = os.path.join(CURRENT_PATH, "defaults.json")
@@ -109,7 +109,7 @@ def get_inputs(meta_params_dict):
         meta_data=True,
         use_full_data=meta_params.use_full_data.tolist()
     )
-    return {"matchup": spec}
+    return meta_params.specification(meta_data=True), {"matchup": spec}
 
 
 def validate_inputs(meta_param_dict, adjustment, errors_warnings):
