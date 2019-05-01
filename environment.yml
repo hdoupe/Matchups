@@ -13,3 +13,6 @@ dependencies:
   - pyarrow
   - fastparquet
   - python-snappy
+  - pip
+  - pip:
+    - compdevkit
