@@ -1,9 +1,9 @@
-from compdevkit import TestEndpoints
+from compdevkit import TestFunctions
 
 import matchups
 
 def test_get_parameters():
-    ta = TestEndpoints(
+    ta = TestFunctions(
         model_parameters=matchups.get_inputs,
         validate_inputs=matchups.validate_inputs,
         run_model=matchups.get_matchup,
