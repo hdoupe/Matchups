@@ -1,5 +1,7 @@
 import json
 import os
+from datetime import datetime, date
+
 
 from bokeh.plotting import figure, show
 from bokeh.models import ColumnDataSource
@@ -7,6 +9,7 @@ from bokeh.embed import components
 from bokeh.palettes import d3
 from bokeh.models.widgets import Tabs, Panel
 import pandas as pd
+import numpy as np
 
 import paramtools
 from marshmallow import ValidationError
@@ -14,6 +17,16 @@ from marshmallow import ValidationError
 from matchups.utils import (CURRENT_PATH, renamedf, pdf_to_clean_html)
 
 CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
+
+
+def my_serialize(data):
+    def ser(obj):
+        if isinstance(obj, (datetime, date)):
+            return str(obj)
+        if isinstance(obj, (np.ndarray, np.generic) ):
+            return obj.tolist()
+        return obj
+    return json.loads(json.dumps(data, default=ser))
 
 
 def count_plot(df, title):
@@ -109,7 +122,7 @@ def get_inputs(meta_params_dict):
         meta_data=True,
         use_full_data=meta_params.use_full_data.tolist()
     )
-    return meta_params.specification(meta_data=True), {"matchup": spec}
+    return my_serialize(meta_params.specification(meta_data=True)), my_serialize({"matchup": spec})
 
 
 def validate_inputs(meta_param_dict, adjustment, errors_warnings):
