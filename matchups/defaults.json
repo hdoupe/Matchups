@@ -15,7 +15,6 @@
         "section_2": "",
         "notes": "If using the 2018 dataset, only use dates in 2018.",
         "type": "date",
-        "number_dims": 0,
         "value": [
             {"use_full_data": true, "value": "2008-01-01"},
             {"use_full_data": false, "value": "2018-01-01"}
@@ -29,7 +28,6 @@
         "section_2": "",
         "notes": "If using the 2018 dataset, only use dates in 2018.",
         "type": "date",
-        "number_dims": 0,
         "value": [
             {"use_full_data": true, "value": "2018-11-10"},
             {"use_full_data": false, "value": "2018-11-10"}

@@ -5,7 +5,7 @@ from compconfig import functions
 
 def test_functions():
     ta = FunctionsTest(
-        model_parameters=functions.get_inputs,
+        get_inputs=functions.get_inputs,
         validate_inputs=functions.validate_inputs,
         run_model=functions.run_model,
         ok_adjustment={"matchup": {"pitcher": [{"value": "Max Scherzer"}]}},

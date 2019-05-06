@@ -19,16 +19,6 @@ from matchups.utils import (CURRENT_PATH, renamedf, pdf_to_clean_html)
 CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-def my_serialize(data):
-    def ser(obj):
-        if isinstance(obj, (datetime, date)):
-            return str(obj)
-        if isinstance(obj, (np.ndarray, np.generic) ):
-            return obj.tolist()
-        return obj
-    return json.loads(json.dumps(data, default=ser))
-
-
 def count_plot(df, title):
     p = figure(title=title, match_aspect=True)
     p.grid.visible = False
@@ -120,9 +110,10 @@ def get_inputs(meta_params_dict):
     params = MatchupsParams()
     spec = params.specification(
         meta_data=True,
+        serializable=True,
         use_full_data=meta_params.use_full_data.tolist()
     )
-    return my_serialize(meta_params.specification(meta_data=True)), my_serialize({"matchup": spec})
+    return meta_params.specification(meta_data=True, serializable=True), {"matchup": spec}
 
 
 def validate_inputs(meta_param_dict, adjustment, errors_warnings):
