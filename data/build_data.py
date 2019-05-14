@@ -2,8 +2,9 @@ import pandas as pd
 
 # people from: https://raw.githubusercontent.com/chadwickbureau/register/master/data/people.csv
 # sc from:
-# from pybaseball import statcast
-# data = statcast(start_dt='2008-01-01', end_dt='2018-11-30')
+from pybaseball import statcast
+data = statcast(start_dt='2008-01-01', end_dt='2019-05-12')
+data.to_parquet("statast_dump.parquet", engine="fastparquet")
 # full statcast.csv.gzip file available upon request.
 
 people = pd.read_csv("people.csv")
