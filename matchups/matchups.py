@@ -15,6 +15,7 @@ import paramtools
 from marshmallow import ValidationError
 
 from matchups.utils import (CURRENT_PATH, renamedf, pdf_to_clean_html)
+from matchups import __version__
 
 CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -153,6 +154,7 @@ def get_matchup(meta_param_dict, adjustment):
         append_output(batter_df, f"{pitcher} v. {batter}", renderable, downloadable)
         del batter_df
     return {
+        "model_version": __version__,
         "renderable": renderable,
         "downloadable": downloadable
     }
