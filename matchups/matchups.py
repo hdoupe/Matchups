@@ -154,7 +154,7 @@ def get_matchup(meta_param_dict, adjustment):
         append_output(batter_df, f"{pitcher} v. {batter}", renderable, downloadable)
         del batter_df
     return {
-        "model_version": __version__,
+        "model_version": f"Matchups {__version__}",
         "renderable": renderable,
         "downloadable": downloadable
     }
