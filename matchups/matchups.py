@@ -143,16 +143,15 @@ def get_matchup(meta_param_dict, adjustment):
                    (scall.date < pd.Timestamp(params.end_date[0]["value"]))]
     print('filtered by date')
 
-    pitcher, batters = params.pitcher[0]["value"], params.batter[0]["value"]
+    pitcher, batter = params.pitcher[0]["value"], params.batter[0]["value"]
     renderable = []
     downloadable = []
     pitcher_df = sc.loc[(scall["player_name"]==pitcher), :]
     append_output(pitcher_df, f"{pitcher} v. All batters", renderable, downloadable)
 
-    for batter in batters:
-        batter_df = pitcher_df.loc[(scall["player_name"]==pitcher) & (scall["batter_name"]==batter), :]
-        append_output(batter_df, f"{pitcher} v. {batter}", renderable, downloadable)
-        del batter_df
+    batter_df = pitcher_df.loc[(scall["player_name"]==pitcher) & (scall["batter_name"]==batter), :]
+    append_output(batter_df, f"{pitcher} v. {batter}", renderable, downloadable)
+
     return {
         "model_version": f"Matchups {__version__}",
         "renderable": renderable,

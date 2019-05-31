@@ -4,7 +4,7 @@ import matchups
 def test_get_matchup():
     adj = {
         'matchup': {
-            'batter': [{'value': ['Freddie Freeman', 'Yasiel Puig'],
+            'batter': [{'value': 'Freddie Freeman',
                         'use_full_data': False}]
         }
     }
@@ -13,7 +13,7 @@ def test_get_matchup():
 def test_get_matchup_empty():
     adj = {
         'matchup': {
-            'pitcher': [{'value': 'Babe Ruth',
+            'pitcher': [{'value': 'John Smoltz',
                         'use_full_data': False}]
         }
     }
