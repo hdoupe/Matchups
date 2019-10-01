@@ -109,12 +109,11 @@ def get_inputs(meta_params_dict):
     meta_params = MetaParams()
     meta_params.adjust(meta_params_dict)
     params = MatchupsParams()
-    spec = params.specification(
-        meta_data=True,
-        serializable=True,
-        use_full_data=meta_params.use_full_data.tolist()
-    )
-    return meta_params.specification(meta_data=True, serializable=True), {"matchup": spec}
+    params.set_state(use_full_data=meta_params.use_full_data.tolist())
+    return {
+        "meta_parameters": meta_params.dump(),
+        "model_parameters": {"matchup": params.dump()}
+    }
 
 
 def validate_inputs(meta_param_dict, adjustment, errors_warnings):
@@ -122,7 +121,7 @@ def validate_inputs(meta_param_dict, adjustment, errors_warnings):
     params = MatchupsParams()
     params.adjust(adjustment["matchup"], raise_errors=False)
     errors_warnings["matchup"]["errors"].update(params.errors)
-    return errors_warnings
+    return {"errors_warnings": errors_warnings}
 
 
 def get_matchup(meta_param_dict, adjustment):
@@ -153,7 +152,6 @@ def get_matchup(meta_param_dict, adjustment):
     append_output(batter_df, f"{pitcher} v. {batter}", renderable, downloadable)
 
     return {
-        "model_version": f"Matchups {__version__}",
         "renderable": renderable,
         "downloadable": downloadable
     }

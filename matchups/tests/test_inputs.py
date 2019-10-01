@@ -28,6 +28,7 @@ def test_parse_bad_inputs():
     }
     ew = {"matchup": {"errors": {}, "warnings": {}}}
     ew = matchups.validate_inputs(meta_params, adj, ew)
+    ew = ew["errors_warnings"]
     assert ew["matchup"]["errors"]["batter"] == ['Not a valid string.']
     assert ew["matchup"]["errors"]["pitcher"] == ["Not a valid string."]
 
@@ -38,5 +39,6 @@ def test_parse_bad_inputs():
     }
     ew = {"matchup": {"errors": {}, "warnings": {}}}
     ew = matchups.validate_inputs(meta_params, adj, ew)
+    ew = ew["errors_warnings"]
     exp = ['batter "fake batter" must be in list of choices.']
     assert ew["matchup"]["errors"]["batter"] == exp
