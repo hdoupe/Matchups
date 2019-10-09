@@ -18,7 +18,7 @@ pip install -e .
 
 # Install using pip
 ```
-pip install -U matchups
+pip install git+https://github.com/hdoupe/Matchups.git@master
 ```
 
 # Run tests
