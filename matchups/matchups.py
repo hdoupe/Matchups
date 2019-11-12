@@ -5,7 +5,7 @@ from datetime import datetime, date
 
 from bokeh.plotting import figure, show
 from bokeh.models import ColumnDataSource
-from bokeh.embed import components
+from bokeh.embed import json_item
 from bokeh.palettes import d3
 from bokeh.models.widgets import Tabs, Panel
 import pandas as pd
@@ -64,20 +64,22 @@ def count_panels(df, main_title):
 
 def append_output(df, title, renderable, downloadable):
     if len(df) == 0:
-        js = ""
-        div = "<p><b>No matchups found.</b></p>"
-    else:
-        js, div = components(count_panels(df, title))
-    renderable.append(
-        {
-            "media_type": "bokeh",
-            "title": title,
-            "data": {
-                "javascript": js,
-                "html": div
+        renderable.append(
+            {
+                "media_type": "table",
+                "title": title,
+                "data": "<p><b>No matchups found.</b></p>"
             }
-        }
-    )
+        )
+    else:
+        data = json_item(count_panels(df, title))
+        renderable.append(
+            {
+                "media_type": "bokeh",
+                "title": title,
+                "data": data
+            }
+        )
     downloadable.append(
         {
             "media_type": "CSV",
