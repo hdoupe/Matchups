@@ -114,8 +114,8 @@ class MatchupsParams(paramtools.Parameters):
         with open(self.defaults_template, "r") as f:
             self.defaults = json.loads(f.read())
 
-        self.defaults["pitcher"]["validators"]["choice"]["choices"] = players.players.tolist()
-        self.defaults["batter"]["validators"]["choice"]["choices"] = players.players.tolist()
+        self.defaults["pitcher"]["validators"]["choice"]["choices"] = ["Max Scherzer"] + players.players.tolist()
+        self.defaults["batter"]["validators"]["choice"]["choices"] = ["Freddie Freeman"] + players.players.tolist()
 
         super().__init__(*args, **kwargs)
 

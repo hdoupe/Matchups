@@ -1,6 +1,7 @@
 import pandas as pd
 
 people = pd.read_csv("people.csv")
+people = people.loc[people.mlb_played_last > 2009, :]
 all_players = pd.DataFrame.from_dict({
     "players": (people.name_first + " " + people.name_last).dropna().unique()
 })

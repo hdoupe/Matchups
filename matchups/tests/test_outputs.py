@@ -13,7 +13,7 @@ def test_get_matchup():
 def test_get_matchup_empty():
     adj = {
         'matchup': {
-            'pitcher': [{'value': 'John Smoltz',
+            'pitcher': [{'value': 'Freddie Freeman',
                         'use_full_data': False}]
         }
     }
