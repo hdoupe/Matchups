@@ -94,7 +94,7 @@ class MetaParams(paramtools.Parameters):
     defaults = {
         "use_full_data": {
             "title": "Use Full Data",
-            "description": "Flag that determines whether Matchups uses the 10 year data set or the 2018 data set.",
+            "description": "Flag that determines whether Matchups uses the 10 year data set or the 2019 data set.",
             "type": "bool",
             "value": True,
             "validators": {"choice": {"choices": [True, False]}}
