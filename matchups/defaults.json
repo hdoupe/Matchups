@@ -3,7 +3,14 @@
         "labels": {
             "use_full_data": {
                 "type": "bool",
-                "validators": {}
+                "validators": {
+                    "choice": {
+                        "choices": [
+                            true,
+                            false
+                        ]
+                    }
+                }
             }
         },
         "additional_members": {

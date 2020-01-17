@@ -40,7 +40,7 @@ def count_plot(df, title):
     pitch_types = df.pitch_type.unique()
     palette = d3["Category20"][max(3, pitch_types.shape[0])]
     for ix, (pitch_type, df) in enumerate(df.groupby("pitch_type")):
-        p.circle(-df.plate_x, df.plate_z, legend=pitch_type,
+        p.circle(-df.plate_x, df.plate_z, legend_label=pitch_type,
                  color=palette[ix], size=10, alpha=1,
                  muted_color=palette[ix], muted_alpha=0.2)
     p.legend.click_policy = "hide"
