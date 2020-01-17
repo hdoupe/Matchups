@@ -1,6 +1,6 @@
 name = "matchups"
 
-__version__ = "1.2.0"
+__version__ = "2020"
 
 from matchups.matchups import *
 from matchups.utils import *
