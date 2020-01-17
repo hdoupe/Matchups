@@ -92,7 +92,7 @@ def append_output(df, title, renderable, downloadable):
 class MetaParams(paramtools.Parameters):
     array_first = True
     defaults = {
-        "use_full_data": {
+        "use_full_sample": {
             "title": "Use Full Data",
             "description": "Flag that determines whether Matchups uses the 10 year data set or the 2019 data set.",
             "type": "bool",
@@ -123,7 +123,7 @@ def get_inputs(meta_params_dict):
     meta_params = MetaParams()
     meta_params.adjust(meta_params_dict)
     params = MatchupsParams()
-    params.set_state(use_full_data=meta_params.use_full_data.tolist())
+    params.set_state(use_full_sample=meta_params.use_full_sample.tolist())
     return {
         "meta_parameters": meta_params.dump(),
         "model_parameters": {"matchup": params.dump()}
@@ -142,10 +142,10 @@ def get_matchup(meta_param_dict, adjustment):
     meta_params = MetaParams()
     meta_params.adjust(meta_param_dict)
     params = MatchupsParams()
-    params.set_state(use_full_data=meta_params.use_full_data.tolist())
+    params.set_state(use_full_sample=meta_params.use_full_sample.tolist())
     params.adjust(adjustment["matchup"])
     print("getting data according to: ", meta_params.specification(), params.specification())
-    if meta_params.use_full_data:
+    if meta_params.use_full_sample:
         path = os.path.join(CURRENT_PATH, "statcast.parquet")
     else:
         path = os.path.join(CURRENT_PATH, "statcast2018.parquet")

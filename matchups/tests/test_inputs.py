@@ -7,19 +7,19 @@ def test_MatchupsParams():
 
 def test_update_params():
     params = matchups.MatchupsParams()
-    adj = {"batter": [{'use_full_data': False, "value": "Alex Rodriguez"}]}
+    adj = {"batter": [{'use_full_sample': False, "value": "Alex Rodriguez"}]}
     params.adjust(adj)
-    params.set_state(use_full_data=False)
+    params.set_state(use_full_sample=False)
     assert params.batter == adj["batter"]
 
 def test_parse_inputs():
-    meta_params = {"use_full_data": True}
+    meta_params = {"use_full_sample": True}
     adj = {"matchup": {"batter": "Alex Rodriguez"}}
     ew = {"matchup": {"errors": {}, "warnings": {}}}
     assert matchups.validate_inputs(meta_params, adj, ew)
 
 def test_parse_bad_inputs():
-    meta_params = {"use_full_data": True}
+    meta_params = {"use_full_sample": True}
     adj = {
         "matchup": {
             "batter": 1,
