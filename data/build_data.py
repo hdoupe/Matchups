@@ -2,12 +2,13 @@ import pandas as pd
 
 # people from: https://raw.githubusercontent.com/chadwickbureau/register/master/data/people.csv
 # sc from:
-# from pybaseball import statcast
-# data = statcast(start_dt='2008-01-01', end_dt='2018-11-30')
+from pybaseball import statcast
+sc = statcast(start_dt='2009-01-01', end_dt='2020-01-01')
+sc.to_parquet("statcast_dump.parquet", engine="fastparquet")
 # full statcast.csv.gzip file available upon request.
 
 people = pd.read_csv("people.csv")
-sc = pd.read_parquet("statast_dump.parquet", engine="fastparquet")
+# sc = pd.read_parquet("statcast_dump.parquet", engine="fastparquet")
 people["batter_name"] = people.name_first + " " + people.name_last
 merged = pd.merge(
     sc,

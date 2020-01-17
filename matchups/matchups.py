@@ -40,7 +40,7 @@ def count_plot(df, title):
     pitch_types = df.pitch_type.unique()
     palette = d3["Category20"][max(3, pitch_types.shape[0])]
     for ix, (pitch_type, df) in enumerate(df.groupby("pitch_type")):
-        p.circle(-df.plate_x, df.plate_z, legend=pitch_type,
+        p.circle(-df.plate_x, df.plate_z, legend_label=pitch_type,
                  color=palette[ix], size=10, alpha=1,
                  muted_color=palette[ix], muted_alpha=0.2)
     p.legend.click_policy = "hide"
@@ -103,9 +103,21 @@ class MetaParams(paramtools.Parameters):
 
 
 class MatchupsParams(paramtools.Parameters):
-    defaults = os.path.join(CURRENT_PATH, "defaults.json")
+    defaults_template = os.path.join(CURRENT_PATH, "defaults.json")
 
+    def __init__(self, *args, **kwargs):
+        players = pd.read_parquet(
+            os.path.join(CURRENT_PATH, "players.parquet"),
+            engine="fastparquet"
+        )
 
+        with open(self.defaults_template, "r") as f:
+            self.defaults = json.loads(f.read())
+
+        self.defaults["pitcher"]["validators"]["choice"]["choices"] = players.players.tolist()
+        self.defaults["batter"]["validators"]["choice"]["choices"] = players.players.tolist()
+
+        super().__init__(*args, **kwargs)
 
 def get_inputs(meta_params_dict):
     meta_params = MetaParams()

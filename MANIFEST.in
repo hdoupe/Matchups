@@ -1,4 +1,5 @@
 include matchups/schema.json
 include matchups/defaults.json
+include matchups/playes.parquet
 include matchups/statcast.parquet
 include matchups/statcast2018.parquet
