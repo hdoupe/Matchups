@@ -139,9 +139,7 @@ def get_inputs(meta_params_dict):
     }
 
 
-def validate_inputs(meta_param_dict, adjustment, errors_warnings):
-    # matchups doesn't look at meta_param_dict for validating inputs.
-    params = MatchupsParams()
+def fixup_dates(adjustment):
     adj = adjustment["matchup"]
     for var in ["start_date", "end_date"]:
         if var in adj:
@@ -158,6 +156,12 @@ def validate_inputs(meta_param_dict, adjustment, errors_warnings):
                     print("exception parsing:", value)
                     print(e)
                     pass
+
+
+def validate_inputs(meta_param_dict, adjustment, errors_warnings):
+    # matchups doesn't look at meta_param_dict for validating inputs.
+    params = MatchupsParams()
+    fixup_dates(adjustment)
     params.adjust(adjustment["matchup"], raise_errors=False)
     errors_warnings["matchup"]["errors"].update(params.errors)
     return {"errors_warnings": errors_warnings}
@@ -168,6 +172,7 @@ def get_matchup(meta_param_dict, adjustment):
     meta_params.adjust(meta_param_dict)
     params = MatchupsParams()
     params.set_state(use_full_sample=meta_params.use_full_sample.tolist())
+    fixup_dates(adjustment)
     params.adjust(adjustment["matchup"])
     print(
         "getting data according to: ",
