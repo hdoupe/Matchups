@@ -8,5 +8,5 @@ class TestFunctions1(CoreTestFunctions):
     get_inputs = functions.get_inputs
     validate_inputs = functions.validate_inputs
     run_model = functions.run_model
-    ok_adjustment={"matchup": {"pitcher": [{"value": "Max Scherzer"}]}}
+    ok_adjustment={"matchup": {"pitcher": [{"value": "Max Scherzer"}], "start_date": [{"value":"2020-10-19T04:00:00.000Z"}]}}
     bad_adjustment={"matchup": {"pitcher": [{"value": "Not a pitcher"}]}}

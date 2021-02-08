@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 
 import paramtools
+import marshmallow as ma
 from marshmallow import ValidationError
 
 from matchups.utils import (CURRENT_PATH, renamedf, pdf_to_clean_html)
@@ -138,6 +139,18 @@ def get_inputs(meta_params_dict):
 def validate_inputs(meta_param_dict, adjustment, errors_warnings):
     # matchups doesn't look at meta_param_dict for validating inputs.
     params = MatchupsParams()
+    adj = adjustment["matchup"]
+    for var in ["start_date", "end_date"]:
+        if var in adj:
+            if not isinstance(adj[var], list):
+                adj[var] = [{"value": adj[var]}]
+            for value in adj[var]:
+                try:
+                    value["value"] = ma.fields.DateTime()._deserialize(value["value"], None, None).date()
+                except Exception as e:
+                    print("exception parsing:", value)
+                    print(e)
+                    pass
     params.adjust(adjustment["matchup"], raise_errors=False)
     errors_warnings["matchup"]["errors"].update(params.errors)
     return {"errors_warnings": errors_warnings}

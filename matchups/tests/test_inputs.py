@@ -12,6 +12,7 @@ def test_update_params():
     params.set_state(use_full_sample=False)
     assert params.batter == adj["batter"]
 
+
 def test_parse_inputs():
     meta_params = {"use_full_sample": True}
     adj = {"matchup": {"batter": "Alex Rodriguez"}}
