@@ -29,7 +29,7 @@
         "description": "Date to start pulling statcast information",
         "section_1": "Date",
         "section_2": "",
-        "notes": "If using the 2019 dataset, only use dates in 2019.",
+        "notes": "If using the 2020 dataset, only use dates in 2020.",
         "type": "date",
         "value": [
             {
@@ -38,7 +38,7 @@
             },
             {
                 "use_full_sample": false,
-                "value": "2019-01-01"
+                "value": "2020-01-01"
             }
         ],
         "validators": {
@@ -53,22 +53,22 @@
         "description": "Date to quit pulling statcast information",
         "section_1": "Date",
         "section_2": "",
-        "notes": "If using the 2019 dataset, only use dates in 2019.",
+        "notes": "If using the 2020 dataset, only use dates in 2020.",
         "type": "date",
         "value": [
             {
                 "use_full_sample": true,
-                "value": "2019-11-10"
+                "value": "2020-11-10"
             },
             {
                 "use_full_sample": false,
-                "value": "2019-11-10"
+                "value": "2020-11-10"
             }
         ],
         "validators": {
             "date_range": {
                 "min": "2009-01-01",
-                "max": "2019-11-10"
+                "max": "2020-11-10"
             }
         }
     },

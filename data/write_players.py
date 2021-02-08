@@ -1,6 +1,6 @@
 import pandas as pd
 
-people = pd.read_csv("people.csv")
+people = pd.read_csv("github://chadwickbureau:register@master/data/people.csv")
 people = people.loc[people.mlb_played_last > 2009, :]
 all_players = pd.DataFrame.from_dict({
     "players": sorted((people.name_first + " " + people.name_last).dropna().unique())

@@ -94,7 +94,7 @@ class MetaParams(paramtools.Parameters):
     defaults = {
         "use_full_sample": {
             "title": "Use Full Data",
-            "description": "Flag that determines whether Matchups uses the 10 year data set or the 2019 data set.",
+            "description": "Flag that determines whether Matchups uses the 10 year data set or the 2020 data set.",
             "type": "bool",
             "value": True,
             "validators": {"choice": {"choices": [True, False]}}
@@ -124,9 +124,14 @@ def get_inputs(meta_params_dict):
     meta_params.adjust(meta_params_dict)
     params = MatchupsParams()
     params.set_state(use_full_sample=meta_params.use_full_sample.tolist())
+
+    # Drop choice lists to reduce JSON size.
+    matchup_params = params.dump()
+    matchup_params["pitcher"]["validators"] = {}
+    matchup_params["batter"]["validators"] = {}
     return {
         "meta_parameters": meta_params.dump(),
-        "model_parameters": {"matchup": params.dump()}
+        "model_parameters": {"matchup": matchup_params}
     }
 
 
@@ -148,7 +153,7 @@ def get_matchup(meta_param_dict, adjustment):
     if meta_params.use_full_sample:
         path = os.path.join(CURRENT_PATH, "statcast.parquet")
     else:
-        path = os.path.join(CURRENT_PATH, "statcast2018.parquet")
+        path = os.path.join(CURRENT_PATH, "statcast_recent.parquet")
     scall = pd.read_parquet(path, engine="fastparquet")
     print('data read')
     scall["date"] = pd.to_datetime(scall["game_date"])
