@@ -3,7 +3,8 @@ import pandas as pd
 # people from: https://raw.githubusercontent.com/chadwickbureau/register/master/data/people.csv
 # sc from:
 from pybaseball import statcast
-sc = statcast(start_dt='2012-01-01', end_dt='2021-01-01')
+
+sc = statcast(start_dt="2012-01-01", end_dt="2021-01-01")
 sc.to_parquet("statcast_dump.parquet", engine="fastparquet")
 
 people = pd.read_csv("github://chadwickbureau:register@master/data/people.csv")

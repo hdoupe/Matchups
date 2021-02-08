@@ -103,15 +103,15 @@
         "section_2": "Batter",
         "notes": "Make sure the name of the batter is correct. A good place to reference this is baseball-reference.com",
         "type": "str",
-        "number_dims": 0,
+        "number_dims": 1,
         "value": [
             {
                 "use_full_sample": true,
-                "value": "Freddie Freeman"
+                "value": ["Freddie Freeman"]
             },
             {
                 "use_full_sample": false,
-                "value": "Juan Soto"
+                "value": ["Juan Soto"]
             }
         ],
         "validators": {
