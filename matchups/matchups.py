@@ -7,7 +7,7 @@ from bokeh.plotting import figure, show
 from bokeh.models import ColumnDataSource
 from bokeh.embed import json_item
 from bokeh.palettes import d3
-from bokeh.models.widgets import Tabs, Panel
+from bokeh.models.layouts import Tabs, TabPanel
 import pandas as pd
 import numpy as np
 
@@ -58,11 +58,11 @@ def count_plot(df, title):
 
 def count_panels(df, main_title):
     p = count_plot(df, main_title)
-    panels = [Panel(child=p, title="All counts")]
+    panels = [TabPanel(child=p, title="All counts")]
 
     for (balls, strikes), df in df.groupby(["balls", "strikes"]):
         panels.append(
-            Panel(
+            TabPanel(
                 child=count_plot(
                     df, f"{main_title} (balls={balls}, strikes={strikes})"
                 ),
